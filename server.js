@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -8,7 +9,7 @@ app.use(express.json());
 
 
 const pool = new Pool({
-    connectionString: 'postgresql://postgres.sorzeozhayztpmencblw:Imorreu1722@aws-1-us-west-2.pooler.supabase.com:5432/postgres',
+    connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false // Obrigatório para conexões remotas
     }
