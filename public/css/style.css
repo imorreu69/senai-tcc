@@ -1,0 +1,94 @@
+:root {
+    --brand-orange: #ff931e;
+    --brand-cyan: #36a9e1;
+    --brand-ink: #0a0906;
+    --brand-taupe: #8a7b63;
+}
+
+body {
+    font-family: 'Segoe UI Variable', 'Segoe UI', 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Tipografia de destaque: Baloo 2 reproduz o desenho geométrico e arredondado da Astonpoliz */
+.font-astonpoliz {
+    font-family: '"Baloo 2"', 'Segoe UI Variable', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Scrollbar na paleta oficial (taupe/ink) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(241, 237, 230, 0.8);
+}
+.dark ::-webkit-scrollbar-track {
+    background: #0a0906;
+}
+::-webkit-scrollbar-thumb {
+    background: #cabeaa;
+    border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #463d2f;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ff931e;
+}
+
+/* Motivos de identidade: Os Portais */
+.portal-gradient-bg {
+    background: linear-gradient(135deg, #36a9e1 0%, #ff931e 100%);
+}
+.portal-gradient-text {
+    background: linear-gradient(135deg, #36a9e1 0%, #ff931e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.portal-gradient-border {
+    border-image: linear-gradient(135deg, #36a9e1, #ff931e) 1;
+}
+.portal-glow-cyan {
+    box-shadow: 0 0 0 2px rgba(54, 169, 225, 0.35);
+}
+.portal-glow-orange {
+    box-shadow: 0 0 0 2px rgba(255, 147, 30, 0.35);
+}
+.portal-ring {
+    display: inline-block;
+    width: 10px;
+    height: 4px;
+    border-radius: 999px;
+}
+
+/* Transição de Abas */
+.tab-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+.tab-content.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Ajustes do Mapa Leaflet */
+.leaflet-container {
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 0.75rem;
+}
+.light .leaflet-popup-content-wrapper {
+    background: #ffffff !important;
+    color: #0a0906 !important;
+    border: 1px solid #e2dace;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.dark .leaflet-popup-content-wrapper {
+    background: #1b1712 !important;
+    color: #f1ede6 !important;
+    border: 1px solid #463d2f;
+}

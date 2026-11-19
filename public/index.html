@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>urbanlink. urbanflow. - Plataforma de Gestão & Simulação Logística</title>
+    
+    <!-- Tailwind CSS & Custom Brand Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tailwind-config.js"></script>
+
+    <!-- Google Fonts: Baloo 2 + Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-white text-slate-900 dark:bg-[#0a0906] dark:text-slate-100 min-h-screen flex flex-col antialiased">
+
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen" class="fixed inset-0 z-[100] bg-[#0a0906] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-[28px] p-8 space-y-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="text-center space-y-3">
+                <svg width="48" height="48" viewBox="0 0 34 34" fill="none" class="mx-auto">
+                    <path d="M8 5v12.5a6.5 6.5 0 0 0 13 0" stroke="#ff931e" stroke-width="5" stroke-linecap="round"/>
+                    <ellipse cx="8" cy="11.5" rx="5.5" ry="1.6" fill="#36a9e1"/>
+                </svg>
+                <h2 class="text-2xl font-astonpoliz font-bold text-slate-900 dark:text-white leading-tight">acesso ao sistema<span class="text-[#ff931e]">.</span></h2>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-xs font-semibold">
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">Perfil de Acesso</label>
+                    <select id="login-role" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+                        <option value="OPERADOR">Operador Master</option>
+                        <option value="USUARIO">Usuário Comum</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">E-mail corporativo</label>
+                    <input type="email" id="login-email" value="admin@urbanlink.com" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-slate-700 dark:text-slate-300 mb-1">Senha</label>
+                    <input type="password" id="login-password" value="123456" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+                </div>
+                <button type="submit" class="w-full py-3 mt-2 bg-[#36a9e1] hover:bg-[#2b8cc0] text-white font-bold rounded-full transition-all text-sm">
+                    Entrar na Plataforma
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#0a0906]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- BRAND LOGO ("urbanlink. urbanflow.") -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                <svg width="30" height="30" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="shrink-0">
+                    <path d="M8 5v12.5a6.5 6.5 0 0 0 13 0" stroke="#ff931e" stroke-width="5" stroke-linecap="round"/>
+                    <ellipse cx="8" cy="11.5" rx="5.5" ry="1.6" fill="#36a9e1"/>
+                </svg>
+
+                <div>
+                    <div class="flex items-center space-x-1.5 font-astonpoliz text-2xl tracking-tight leading-none">
+                        <span class="text-slate-900 dark:text-white lowercase">urbanlink<span class="text-[#36a9e1]">.</span></span>
+                        <span class="text-slate-900 dark:text-white lowercase">urbanflow<span class="text-[#ff931e]">.</span></span>
+                    </div>
+                    <p class="text-[11px] font-semibold text-slate-500 tracking-wide mt-0.5">plataforma de logística urbana</p>
+                </div>
+            </div>
+
+            <!-- NAVIGATION MENU -->
+            <nav class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-2 bg-[#36a9e1] text-white shadow-sm">
+                    <i class="fa-solid fa-chart-line"></i> <span>Painel KPI</span>
+                </button>
+                <button onclick="switchTab('optimizer')" id="nav-optimizer" class="nav-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-[#ff931e]"></i> <span>Otimizador</span>
+                </button>
+                <button onclick="switchTab('map')" id="nav-map" class="nav-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-[#36a9e1]"></i> <span>Mapa Live</span>
+                </button>
+                <button onclick="switchTab('simulator')" id="nav-simulator" class="nav-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-[#ff931e]"></i> <span>Simulador</span>
+                </button>
+                <button onclick="switchTab('crud')" id="nav-crud" class="nav-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked"></i> <span>Gestão CRUD</span>
+                </button>
+                <button onclick="switchTab('docs')" id="nav-docs" class="nav-btn px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-code text-purple-500"></i> <span>API & BD (SENAI)</span>
+                </button>
+            </nav>
+
+            <!-- CONTROLS & THEME TOGGLE -->
+            <div class="flex items-center space-x-3">
+                <div class="hidden xl:flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Hub SP: <strong class="text-[#36a9e1]">Operacional</strong></span>
+                </div>
+
+                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-[#36a9e1] transition-all" title="Alternar Tema">
+                    <i class="fa-solid fa-sun text-amber-500 dark:hidden"></i>
+                    <i class="fa-solid fa-moon text-sky-400 hidden dark:block"></i>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+    <!-- MAIN BODY CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: PAINEL KPI & VISÃO GERAL            -->
+        <!-- ========================================== -->
+        <section id="tab-dashboard" class="tab-content active space-y-6">
+            
+            <!-- HEADER BANNER -->
+            <div class="bg-[#0a0906] text-white p-6 md:p-8 rounded-3xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="z-10 space-y-2 max-w-xl">
+                    <p class="text-xs font-semibold text-[#36a9e1] tracking-wide">painel de controle · logística urbana</p>
+                    <h1 class="text-2xl md:text-4xl font-astonpoliz font-bold text-white leading-tight">
+                        fluxo de operações em tempo real<span class="text-[#ff931e]">.</span>
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-300 max-w-md">
+                        Monitoramento de entregas, roteirização eco-eficiente e simulação logística baseada em dados urbanos.
+                    </p>
+                </div>
+                <div class="hidden lg:flex items-center gap-6 z-10 pr-2">
+                    <svg width="64" height="78" viewBox="0 0 72 88" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M16 10v38a20 20 0 0 0 40 0" stroke="#ff931e" stroke-width="11" stroke-linecap="round"/>
+                        <ellipse cx="16" cy="34" rx="16" ry="4.5" fill="#36a9e1"/>
+                    </svg>
+                    <div class="text-right">
+                        <div class="text-3xl font-astonpoliz font-bold text-[#36a9e1]">98,4%</div>
+                        <div class="text-xs text-slate-400">SLA · Hub São Paulo</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI CARDS GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-[#0a0906] p-5 rounded-[28px] relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-semibold text-slate-400">Entregas totais (hoje)</p>
+                        <i class="fa-solid fa-box-archive text-[#ff931e] text-sm"></i>
+                    </div>
+                    <h3 class="text-3xl font-astonpoliz font-bold text-white mt-2" id="kpi-total">1.482</h3>
+                    <div class="mt-3 flex items-center text-xs font-semibold text-[#36a9e1] gap-1">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        <span>+12,4% vs. meta diária</span>
+                    </div>
+                </div>
+
+                <div class="bg-[#ff931e] p-5 rounded-[28px] relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-semibold text-white/80">Frota em trânsito</p>
+                        <i class="fa-solid fa-truck-fast text-white/90 text-sm"></i>
+                    </div>
+                    <h3 class="text-3xl font-astonpoliz font-bold text-white mt-2" id="kpi-vehicles">42 / 50</h3>
+                    <div class="mt-3 flex items-center text-xs text-white/90 font-semibold gap-2">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#0a0906]"></span> 38 elétricos (EV)
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-[28px] border-2 border-[#0a0906] dark:border-slate-200 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Cumprimento SLA</p>
+                        <i class="fa-solid fa-shield-halved text-emerald-600 text-sm"></i>
+                    </div>
+                    <h3 class="text-3xl font-astonpoliz font-bold text-slate-900 dark:text-white mt-2" id="kpi-sla">98,4%</h3>
+                    <div class="mt-3 flex items-center text-xs text-emerald-600 dark:text-emerald-400 font-semibold gap-1">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Dentro do prazo de entrega</span>
+                    </div>
+                </div>
+
+                <div class="bg-[#36a9e1] p-5 rounded-[28px] relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-semibold text-white/80">CO₂ evitado (smart route)</p>
+                        <i class="fa-solid fa-leaf text-white/90 text-sm"></i>
+                    </div>
+                    <h3 class="text-3xl font-astonpoliz font-bold text-white mt-2" id="kpi-co2">384,2 kg</h3>
+                    <div class="mt-3 flex items-center text-xs text-white/90 font-semibold gap-1">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span>Equivalente a 19 árvores/mês</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT ACTIVITY & SYSTEM SUMMARY -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                        <h3 class="font-astonpoliz font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-[#36a9e1]"></i> Volume de Entregas por Período
+                        </h3>
+                        <span class="text-xs text-slate-500">Dados do dia corrente</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="kpiChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                        <h3 class="font-astonpoliz font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bell text-[#ff931e]"></i> Atividades Recentes
+                        </h3>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[#36a9e1]/10 text-[#36a9e1]">Ao Vivo</span>
+                    </div>
+                    <div id="activity-feed" class="space-y-3 text-xs max-h-[230px] overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: OTIMIZADOR DE ROTAS INTELIGENTE     -->
+        <!-- ========================================== -->
+        <section id="tab-optimizer" class="tab-content space-y-6">
+            
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 dark:border-slate-700 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-xl font-astonpoliz font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-[#ff931e]"></i>
+                            Otimizador de Rotas Inteligente
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
+                            Algoritmo de menor caminho com cálculo Haversine e mitigação de emissões de CO₂.
+                        </p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#36a9e1]/10 text-[#36a9e1] border border-[#36a9e1]/30 self-start md:self-auto">
+                        Motor Algorítmico Ativo
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="space-y-4 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-[#36a9e1]"></i> Configurar Rota
+                        </h3>
+
+                        <form id="optimizer-form" onsubmit="runOptimization(event)" class="space-y-4 text-xs">
+                            <div>
+                                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Hub de Origem (CD)</label>
+                                <select id="opt-hub" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                                    <option value="-23.55052, -46.633308">Hub Central - Sé / Centro SP</option>
+                                    <option value="-23.57000, -46.645000">Hub Sul - Vila Mariana SP</option>
+                                    <option value="-23.52000, -46.680000">Hub Oeste - Lapa SP</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ponto de Destino / Região</label>
+                                <select id="opt-dest" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                                    <option value="-23.58950, -46.681200">Faria Lima / Itaim Bibi (Empresarial)</option>
+                                    <option value="-23.50000, -46.620000">Santana (Zona Norte)</option>
+                                    <option value="-23.61000, -46.660000">Moema / Aeroporto Congonhas</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Veículo de Transporte</label>
+                                <select id="opt-vehicle" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                                    <option value="ev-van">E-Transit Van (100% Elétrica | Emissão Zero)</option>
+                                    <option value="e-bike">Cargo E-Bike (Agilidade Alta em Corredores)</option>
+                                    <option value="diesel">Van Convencional (Frota Legada)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Penalidade de Tráfego Urbano</label>
+                                <input type="range" id="opt-traffic-slider" min="1.0" max="2.5" step="0.1" value="1.3" oninput="document.getElementById('opt-traffic-val').innerText = this.value + 'x'" class="w-full accent-[#ff931e]">
+                                <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                    <span>Fluido (1.0x)</span>
+                                    <span id="opt-traffic-val" class="font-bold text-[#ff931e]">1.3x</span>
+                                    <span>Lento (2.5x)</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-3 bg-[#36a9e1] hover:bg-[#2b8cc0] text-white font-bold rounded-full transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-calculator"></i> Otimizar trajeto
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 block">Distância Calculada</span>
+                                <div class="text-2xl font-extrabold text-[#36a9e1]" id="opt-res-dist">8.4 km</div>
+                                <span class="text-[10px] text-slate-400">Fórmula Haversine</span>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 block">Tempo Estimado (ETA)</span>
+                                <div class="text-2xl font-extrabold text-[#ff931e]" id="opt-res-eta">19 min</div>
+                                <span class="text-[10px] text-emerald-600 font-semibold">-5 min via rota smart</span>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 block">CO₂ Evitado</span>
+                                <div class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="opt-res-co2">1.76 kg</div>
+                                <span class="text-[10px] text-slate-400">Frota Elétrica EV</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+                            <div class="flex justify-between items-center text-xs text-slate-600 dark:text-slate-300">
+                                <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-map text-[#36a9e1]"></i> Visualização do Traçado Otimizado</span>
+                                <span class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-circle-check"></i> Sem Zonas de Restrição</span>
+                            </div>
+                            <div id="opt-map" class="w-full h-64 rounded-lg"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: MAPA EM TEMPO REAL                  -->
+        <!-- ========================================== -->
+        <section id="tab-map" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700 pb-3">
+                    <div>
+                        <h2 class="text-xl font-astonpoliz font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-[#36a9e1]"></i>
+                            Monitoramento de Frota em Tempo Real
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Rastreamento de Hubs, veículos elétricos ativos e pontos de entrega em São Paulo.
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="recenterLiveMap()" class="px-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 transition-all font-semibold border border-slate-200 dark:border-slate-600">
+                            <i class="fa-solid fa-crosshairs text-[#ff931e]"></i> Recentrar SP
+                        </button>
+                    </div>
+                </div>
+
+                <div id="live-map" class="w-full h-[520px] rounded-xl shadow-inner z-10"></div>
+
+                <div class="flex flex-wrap items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700 gap-2">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#36a9e1] border border-white"></span> Hub / Centro de Distribuição</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#ff931e] border border-white"></span> Veículo EV em Trânsito</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 border border-white"></span> Destino de Entrega</span>
+                    </div>
+                    <span class="text-[11px] text-slate-400">Atualização simulada via GPS/Telemetria</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: SIMULADOR DE LOGÍSTICA URBANA       -->
+        <!-- ========================================== -->
+        <section id="tab-simulator" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 dark:border-slate-700 pb-4">
+                    <h2 class="text-xl font-astonpoliz font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-[#ff931e]"></i>
+                        Simulador de Cenários Urbanos
+                    </h2>
+                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
+                        Ajuste variáveis climatológicas e de tráfego para prever o nível de serviço (SLA) e custos operacionais.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4 text-xs">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-gears text-[#36a9e1]"></i> Variáveis da Cidade
+                        </h3>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <label class="font-semibold text-slate-700 dark:text-slate-300">Densidade de Trânsito</label>
+                                <span class="text-[#36a9e1] font-bold" id="sim-val-traffic">65%</span>
+                            </div>
+                            <input type="range" id="sim-traffic" min="10" max="100" value="65" oninput="runSimulation()" class="w-full accent-[#36a9e1]">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Condição Climatológica</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" onclick="setWeather('clear')" id="weather-clear" class="weather-btn px-2 py-2 rounded-lg bg-[#36a9e1] text-white font-bold border border-slate-200 dark:border-slate-700 text-center">
+                                    <i class="fa-solid fa-sun block text-sm mb-0.5"></i> Céu Limpo
+                                </button>
+                                <button type="button" onclick="setWeather('rain')" id="weather-rain" class="weather-btn px-2 py-2 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-center hover:bg-slate-100">
+                                    <i class="fa-solid fa-cloud-rain block text-sm mb-0.5"></i> Chuva
+                                </button>
+                                <button type="button" onclick="setWeather('storm')" id="weather-storm" class="weather-btn px-2 py-2 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-center hover:bg-slate-100">
+                                    <i class="fa-solid fa-bolt block text-sm mb-0.5"></i> Tempestade
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <label class="font-semibold text-slate-700 dark:text-slate-300">Frota Ativa de Veículos</label>
+                                <span class="text-[#ff931e] font-bold" id="sim-val-fleet">50 Veículos</span>
+                            </div>
+                            <input type="range" id="sim-fleet" min="10" max="100" value="50" oninput="runSimulation()" class="w-full accent-[#ff931e]">
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between">
+                                <label class="font-semibold text-slate-700 dark:text-slate-300">Demanda de Pedidos/Dia</label>
+                                <span class="text-purple-600 dark:text-purple-400 font-bold" id="sim-val-orders">1,800</span>
+                            </div>
+                            <input type="range" id="sim-orders" min="500" max="3000" step="100" value="1800" oninput="runSimulation()" class="w-full accent-purple-500">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 block">SLA Projetado</span>
+                                <div class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="sim-res-sla">94.2%</div>
+                                <span class="text-[10px] text-slate-400">Dentro da janela padrão</span>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 block">Atraso Médio Estimado</span>
+                                <div class="text-2xl font-extrabold text-[#ff931e]" id="sim-res-delay">+4.2 min</div>
+                                <span class="text-[10px] text-slate-400">Ajustado por clima/tráfego</span>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <span class="text-xs text-slate-500 block">Redução CO₂ Prevista</span>
+                                <div class="text-2xl font-extrabold text-[#36a9e1]" id="sim-res-co2">-28.4%</div>
+                                <span class="text-[10px] text-slate-400">Vs. frota convencional</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                Projeção Hora-a-Hora: Capacidade de Atendimento
+                            </h3>
+                            <div class="h-60">
+                                <canvas id="simChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: GESTÃO CRUD DE ENTREGAS             -->
+        <!-- ========================================== -->
+        <section id="tab-crud" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+                    <div>
+                        <h2 class="text-xl font-astonpoliz font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-stacked text-[#36a9e1]"></i>
+                            Gestão de Entregas & Pedidos (Operações CRUD)
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
+                            Cadastre, edite e acompanhe os registros de logística no sistema.
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="exportCSV()" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg hover:bg-slate-200 transition-all border border-slate-200 dark:border-slate-600 flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv text-emerald-600"></i> Exportar CSV
+                        </button>
+                        <button onclick="openDeliveryModal()" class="px-4 py-2 bg-[#ff931e] hover:bg-[#e07f12] text-white font-bold text-xs rounded-full transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i> Nova entrega
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                        <input type="text" id="crud-search" oninput="filterDeliveries()" placeholder="Buscar por código, cliente ou bairro..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg pl-9 pr-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                    </div>
+                    <div>
+                        <select id="crud-filter-status" onchange="filterDeliveries()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                            <option value="ALL">Todos os Status</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em Trânsito">Em Trânsito</option>
+                            <option value="Concluído">Concluído</option>
+                            <option value="Atrasado">Atrasado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="crud-filter-hub" onchange="filterDeliveries()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                            <option value="ALL">Todos os Hubs</option>
+                            <option value="Hub Central">Hub Central</option>
+                            <option value="Hub Sul">Hub Sul</option>
+                            <option value="Hub Oeste">Hub Oeste</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                    <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+                        <thead class="bg-slate-100 dark:bg-slate-900 text-slate-500 uppercase font-bold border-b border-slate-200 dark:border-slate-700">
+                            <tr>
+                                <th class="p-3">CÓDIGO</th>
+                                <th class="p-3">CLIENTE</th>
+                                <th class="p-3">ENDEREÇO</th>
+                                <th class="p-3">HUB ORIGEM</th>
+                                <th class="p-3">STATUS</th>
+                                <th class="p-3">JANELA SLA</th>
+                                <th class="p-3 text-center">AÇÕES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crud-table-body" class="divide-y divide-slate-200 dark:divide-slate-700/60 bg-white dark:bg-slate-800"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 6: DOCUMENTAÇÃO API & BANCO SQL        -->
+        <!-- ========================================== -->
+        <section id="tab-docs" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 dark:border-slate-700 pb-4">
+                    <h2 class="text-xl font-astonpoliz font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-code text-purple-600"></i>
+                        Documentação Técnica & Banco de Dados (Projeto SENAI)
+                    </h2>
+                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
+                        Especificação OpenAPI / Swagger, script SQL normalizado e instruções de repositório Git.
+                    </p>
+                </div>
+
+                <div class="flex border-b border-slate-200 dark:border-slate-700 gap-4 text-xs font-bold">
+                    <button onclick="switchDocSub('swagger')" id="doc-sub-swagger" class="doc-sub-btn pb-2 border-b-2 border-[#36a9e1] text-[#36a9e1]">
+                        <i class="fa-solid fa-fire"></i> Swagger / REST API
+                    </button>
+                    <button onclick="switchDocSub('sql')" id="doc-sub-sql" class="doc-sub-btn pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-database text-emerald-600"></i> Script SQL (DDL/DML)
+                    </button>
+                    <button onclick="switchDocSub('erd')" id="doc-sub-erd" class="doc-sub-btn pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-diagram-project text-[#ff931e]"></i> Modelo ER
+                    </button>
+                    <button onclick="switchDocSub('git')" id="doc-sub-git" class="doc-sub-btn pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-brands fa-git-alt text-red-500"></i> Repositório Git
+                    </button>
+                </div>
+
+                <!-- SWAGGER SUB TAB -->
+                <div id="doc-content-swagger" class="space-y-4">
+                    <div class="p-3 bg-slate-100 dark:bg-slate-900 rounded-lg text-xs flex items-center justify-between">
+                        <span class="font-bold text-slate-700 dark:text-slate-300">Base URL: <code class="text-[#36a9e1]">http://localhost:3005/api/v1</code></span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] font-bold">OAS 3.0</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs font-mono">
+                        <div class="border border-emerald-500/30 rounded-lg bg-emerald-500/5 overflow-hidden">
+                            <div class="p-3 flex items-center justify-between cursor-pointer" onclick="toggleEp('ep-1')">
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-2 py-0.5 bg-emerald-600 text-white font-extrabold rounded">GET</span>
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">/api/v1/deliveries</span>
+                                    <span class="text-slate-500 text-[11px] hidden sm:inline">- Listar entregas</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                            </div>
+                            <div id="ep-1" class="p-4 bg-slate-900 text-emerald-400 hidden">
+<pre>{
+  "status": "success",
+  "data": [
+    { "id": "DEL-901", "customer": "Hospital das Clínicas", "status": "Em Trânsito" }
+  ]
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="border border-[#36a9e1]/30 rounded-lg bg-[#36a9e1]/5 overflow-hidden">
+                            <div class="p-3 flex items-center justify-between cursor-pointer" onclick="toggleEp('ep-2')">
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-2 py-0.5 bg-[#36a9e1] text-white font-extrabold rounded">POST</span>
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">/api/v1/routes/optimize</span>
+                                    <span class="text-slate-500 text-[11px] hidden sm:inline">- Otimizar rotas e CO2</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-slate-400"></i>
+                            </div>
+                            <div id="ep-2" class="p-4 bg-slate-900 text-amber-300 hidden">
+<pre>{
+  "origin_hub_id": 1,
+  "destination_coords": [-23.5895, -46.6812],
+  "vehicle_type": "ev-van"
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SQL SUB TAB -->
+                <div id="doc-content-sql" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Script DDL PostgreSQL (Supabase)</h3>
+                        <button onclick="copySQL()" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-xs rounded border border-slate-300 dark:border-slate-600 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-copy text-[#36a9e1]"></i> Copiar SQL
+                        </button>
+                    </div>
+                    <pre id="sql-code-block" class="p-4 bg-slate-900 text-emerald-400 rounded-xl font-mono text-xs overflow-x-auto max-h-80">
+-- URBANLINK FLOW - ESTRUTURA COMPLETA BANCO DE DADOS
+CREATE TABLE tb_usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    senha VARCHAR(120) NOT NULL,
+    perfil VARCHAR(30) DEFAULT 'OPERADOR'
+);
+
+CREATE TABLE tb_hub (
+    id_hub SERIAL PRIMARY KEY,
+    nome VARCHAR(80) NOT NULL,
+    latitude DECIMAL(10,8) NOT NULL,
+    longitude DECIMAL(11,8) NOT NULL
+);
+
+CREATE TABLE tb_veiculo (
+    id_veiculo SERIAL PRIMARY KEY,
+    placa VARCHAR(10) UNIQUE NOT NULL,
+    tipo VARCHAR(30) NOT NULL,
+    soc_bateria INT DEFAULT 100
+);
+
+CREATE TABLE tb_entrega (
+    id_entrega VARCHAR(20) PRIMARY KEY,
+    id_hub_origem INT REFERENCES tb_hub(id_hub),
+    cliente_nome VARCHAR(100) NOT NULL,
+    endereco_destino TEXT NOT NULL,
+    status VARCHAR(30) DEFAULT 'Pendente',
+    sla VARCHAR(10) DEFAULT '19:00'
+);</pre>
+                </div>
+
+                <!-- ERD SUB TAB -->
+                <div id="doc-content-erd" class="space-y-4 hidden">
+                    <div class="p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border-2 border-[#36a9e1]">
+                                <div class="font-bold text-[#36a9e1] text-sm border-b pb-1 mb-2">tb_hub</div>
+                                <div><strong class="text-amber-500">PK</strong> id_hub (INT)</div>
+                                <div>nome (VARCHAR)</div>
+                                <div>latitude / longitude</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border-2 border-[#ff931e]">
+                                <div class="font-bold text-[#ff931e] text-sm border-b pb-1 mb-2">tb_entrega</div>
+                                <div><strong class="text-amber-500">PK</strong> id_entrega (VARCHAR)</div>
+                                <div><strong class="text-purple-500">FK</strong> id_hub_origem</div>
+                                <div>cliente_nome / status / sla</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border-2 border-emerald-500">
+                                <div class="font-bold text-emerald-500 text-sm border-b pb-1 mb-2">tb_veiculo</div>
+                                <div><strong class="text-amber-500">PK</strong> id_veiculo (INT)</div>
+                                <div>placa / soc_bateria</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GIT SUB TAB -->
+                <div id="doc-content-git" class="space-y-4 hidden text-xs">
+                    <div class="p-4 bg-slate-900 text-slate-100 rounded-xl font-mono">
+                        <p class="text-slate-400 mb-2"># Inicialização do Repositório Git (SENAI):</p>
+                        <p class="text-amber-300">git init</p>
+                        <p class="text-amber-300">git add .</p>
+                        <p class="text-amber-300">git commit -m "feat: urbanlink flow release final - arquitetura modular"</p>
+                        <p class="text-amber-300">git remote add origin https://github.com/imorreu69/senai-tcc.git</p>
+                        <p class="text-amber-300">git push -u origin main</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto bg-white dark:bg-[#0a0906] border-t border-slate-200 dark:border-slate-800 py-4 px-6 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center space-x-1.5 font-astonpoliz font-extrabold text-sm">
+                <span class="text-slate-900 dark:text-white lowercase">urbanlink<span class="text-[#36a9e1]">.</span></span>
+                <span class="text-slate-900 dark:text-white lowercase">urbanflow<span class="text-[#ff931e]">.</span></span>
+                <span class="font-sans font-normal text-slate-400 text-xs ml-2">© 2026 UrbanLink Systems Inc.</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span>Versão 2.5.0-BrandRelease</span>
+                <span>•</span>
+                <span>Projeto Integrador SENAI</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: ADD/EDIT DELIVERY -->
+    <div id="delivery-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+                <h3 class="text-base font-astonpoliz font-bold text-slate-900 dark:text-white flex items-center gap-2" id="modal-title">
+                    <i class="fa-solid fa-box text-[#ff931e]"></i> Cadastrar Entrega
+                </h3>
+                <button onclick="closeDeliveryModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="delivery-form" onsubmit="saveDelivery(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="form-id">
+
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome do Cliente</label>
+                    <input type="text" id="form-customer" required placeholder="Ex: Mercado Central" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Endereço de Destino</label>
+                    <input type="text" id="form-address" required placeholder="Ex: Av. Faria Lima, 2000" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Hub Origem</label>
+                        <select id="form-hub" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                            <option value="Hub Central">Hub Central - Sé</option>
+                            <option value="Hub Sul">Hub Sul - Vila Mariana</option>
+                            <option value="Hub Oeste">Hub Oeste - Lapa</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                        <select id="form-status" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[#36a9e1]">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em Trânsito">Em Trânsito</option>
+                            <option value="Concluído">Concluído</option>
+                            <option value="Atrasado">Atrasado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-700">
+                    <button type="button" onclick="closeDeliveryModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-semibold">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-[#36a9e1] hover:bg-[#2c8fc0] text-white font-bold rounded-full">
+                        Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS MODULARES -->
+    <script src="js/map.js"></script>
+    <script src="js/optimizer.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/crud.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
