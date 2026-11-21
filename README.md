@@ -1,46 +1,68 @@
-# UrbanLink Flow — Plataforma de Gestão & Simulação Logística
+# UrbanLink Flow
 
-Projeto Integrador / TCC (SENAI) organizado em arquitetura modular full-stack (**HTML/CSS/JS + Node.js/Express + Supabase**).
+Sistema web de gestão de entregas urbanas e rastreamento em mapa, desenvolvido como Trabalho de Conclusão de Curso (TCC) no SENAI.
 
-## Estrutura de Pastas
+## Acesso ao Sistema
+
+* **Aplicação em produção:** https://senai-tcc-kappa.vercel.app
+
+## Objetivo
+
+Centralizar o controle operacional de entregas em uma única aplicação web, permitindo que operadores cadastrem e atualizem o status das rotas enquanto usuários comuns acompanham o andamento dos pedidos pelo mapa.
+
+## Funcionalidades
+
+* **Login e controle de perfil:** Autenticação separada por nível de acesso (`OPERADOR` e `USUARIO`), ocultando menus administrativos para usuários comuns.
+* **Cadastro de usuário:** Criação de conta diretamente na tela inicial com atribuição automática do perfil `USUARIO` e validação de e-mail único.
+* **Redefinição de senha:** Alteração de senha feita na própria tela de acesso mediante confirmação do e-mail e da palavra de segurança cadastrada.
+* **CRUD de entregas:** Cadastro, listagem, edição de status e exclusão de entregas no banco de dados.
+* **Mapa interativo:** Visualização geográfica dos pontos de entrega usando Leaflet.
+
+## Tecnologias Utilizadas
+
+* **Frontend:** HTML5, CSS3, Tailwind CSS, JavaScript, Leaflet.js
+* **Backend:** Node.js, Express
+* **Banco de Dados:** PostgreSQL (Supabase)
+* **Deploy e Versionamento:** Vercel, Git, GitHub
+
+## Modelagem do Banco de Dados
+
+O banco de dados relacional no Supabase possui duas tabelas principais:
+
+### `tb_usuario`
+
+| Coluna | Tipo | Restrição | Descrição |
+| :--- | :--- | :--- | :--- |
+| `id_usuario` | `INTEGER` | `PRIMARY KEY` | Identificador do usuário |
+| `nome` | `VARCHAR` | `NOT NULL` | Nome do usuário |
+| `email` | `VARCHAR` | `UNIQUE, NOT NULL` | E-mail de login |
+| `senha` | `VARCHAR` | `NOT NULL` | Senha de acesso |
+| `perfil` | `VARCHAR` | `NOT NULL` | Perfil (`OPERADOR` ou `USUARIO`) |
+| `palavra_seguranca` | `VARCHAR` | `NOT NULL` | Palavra-chave usada na recuperação de senha |
+| `reset_token` | `VARCHAR` | `NULL` | Token auxiliar de recuperação |
+| `reset_expires` | `TIMESTAMP` | `NULL` | Data de expiração do token |
+
+### `tb_entrega`
+
+| Coluna | Tipo | Restrição | Descrição |
+| :--- | :--- | :--- | :--- |
+| `id_entrega` | `INTEGER` | `PRIMARY KEY` | Identificador da entrega |
+| `descricao` | `VARCHAR` | `NOT NULL` | Descrição ou código da entrega |
+| `endereco` | `VARCHAR` | `NOT NULL` | Endereço de destino |
+| `latitude` | `NUMERIC` | `NULL` | Latitude do destino |
+| `longitude` | `NUMERIC` | `NULL` | Longitude do destino |
+| `status` | `VARCHAR` | `NOT NULL` | Status atual da entrega |
+
+### Estrutura das Tabelas
 
 ```text
-urbanlink-flow/
-├── database/
-│   └── schema.sql            # Script DDL e dados iniciais do PostgreSQL/Supabase
-├── public/                   # Frontend estático (servido pelo Express)
-│   ├── css/
-│   │   └── style.css         # Estilos da identidade visual UrbanLink
-│   ├── js/
-│   │   ├── tailwind-config.js # Paleta e fontes customizadas do Tailwind
-│   │   ├── map.js            # Motor de mapas Leaflet (Esri) e telemetria
-│   │   ├── optimizer.js      # Cálculo de rota Haversine e emissões de CO2
-│   │   ├── simulator.js      # Simulador de cenários urbanos e gráficos
-│   │   ├── crud.js           # Integração REST API (Login e CRUD de entregas)
-│   │   └── main.js           # Navegação, temas claro/escuro e inicialização
-│   └── index.html            # Interface principal da plataforma
-├── src/                      # Backend Node.js / Express
-│   ├── config/
-│   │   └── supabase.js       # Cliente Supabase via HTTPS (porta 443)
-│   ├── routes/
-│   │   ├── authRoutes.js     # Rota de autenticação (/api/v1/login)
-│   │   ├── deliveryRoutes.js # Rotas CRUD (/api/v1/deliveries)
-│   │   └── routeOptimizerRoutes.js # Rota de otimização (/api/v1/routes/optimize)
-│   └── server.js             # Ponto de entrada da aplicação
-├── .env.example              # Modelo de variáveis de ambiente
-├── .gitignore                # Proteção contra envio de .env e node_modules
-└── package.json              # Dependências e scripts de execução
-```
-
-## Como Executar
-
-1. Copie ou renomeie `.env.example` para `.env` e preencha `SUPABASE_URL` e `SUPABASE_KEY`.
-2. Instale as dependências (caso ainda não tenha a pasta `node_modules`):
-   ```bash
-   npm install
-   ```
-3. Inicie o servidor:
-   ```bash
-   npm start
-   ```
-4. Acesse no navegador: `http://localhost:3005`
+tb_usuario                          tb_entrega
+--------------------------          --------------------------
+id_usuario (PK, INTEGER)            id_entrega (PK, INTEGER)
+nome (VARCHAR)                      descricao (VARCHAR)
+email (UQ, VARCHAR)                 endereco (VARCHAR)
+senha (VARCHAR)                     latitude (NUMERIC)
+perfil (VARCHAR)                    longitude (NUMERIC)
+palavra_seguranca (VARCHAR)         status (VARCHAR)
+reset_token (VARCHAR)
+reset_expires (TIMESTAMP)
