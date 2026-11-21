@@ -18,18 +18,22 @@ async function handleLogin(e) {
             body: JSON.stringify({ email, password, perfil: role })
         });
         const data = await res.json();
-
-        if (data.status === 'success') {
-            document.getElementById('login-screen').classList.add('hidden');
-            if (role === 'USUARIO') {
-                document.getElementById('nav-docs').style.display = 'none';
-                document.getElementById('nav-crud').style.display = 'none';
+            if (!res.ok) {
+            alert(data.error || 'Erro ao fazer login');
+        return;
             }
-            showToast(`Bem-vindo, ${data.user.nome}`, 'success');
-            fetchDeliveries();
-        } else {
-            alert('Credenciais inválidas!');
-        }
+
+        if (data.status === 'success' || data.user) {
+    document.getElementById('login-screen').classList.add('hidden');
+    if (role === 'USUARIO') {
+        document.getElementById('nav-docs').style.display = 'none';
+        document.getElementById('nav-crud').style.display = 'none';
+    }
+    showToast(`Bem-vindo, ${data.user.nome}`, 'success');
+    fetchDeliveries();
+} else {
+    alert('Credenciais inválidas!');
+}
     } catch (err) {
         alert('Erro ao ligar ao servidor Node.js.');
     }

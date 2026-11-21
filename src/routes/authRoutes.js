@@ -5,7 +5,9 @@ const supabase = require('../config/supabase');
 // 1. LOGIN
 router.post('/login', async (req, res) => {
     try {
-        const { email, senha, perfil } = req.body;
+        const email = req.body.email;
+        const senha = req.body.senha || req.body.password;
+        const perfil = req.body.perfil || req.body.role;
 
         if (!email || !senha || !perfil) {
             return res.status(400).json({ error: 'Preencha e-mail, senha e perfil.' });
@@ -13,17 +15,28 @@ router.post('/login', async (req, res) => {
 
         const { data, error } = await supabase
             .from('tb_usuario')
-            .select('nome, email, perfil')
+            .select('*')
             .eq('email', email.trim().toLowerCase())
-            .eq('senha', senha)
-            .eq('perfil', perfil)
             .single();
 
         if (error || !data) {
-            return res.status(401).json({ error: 'Credenciais inválidas ou perfil incorreto.' });
+            return res.status(401).json({ error: `Usuário não encontrado no banco. Detalhe: ${error?.message || 'vazio'}` });
         }
 
-        return res.status(200).json({ message: 'Login realizado!', user: data });
+        const senhaBanco = data.senha ?? data.senha_hash;
+        if (senhaBanco !== senha) {
+            return res.status(401).json({ error: 'A senha digitada não bate com a do banco.' });
+        }
+
+        if (data.perfil !== perfil) {
+            return res.status(401).json({ error: `Perfil incorreto. No banco este e-mail é: ${data.perfil}` });
+        }
+
+        return res.status(200).json({
+            success: 'success',
+            message: 'Login realizado!',
+            user: data
+        });
     } catch (err) {
         return res.status(500).json({ error: 'Erro interno no servidor.' });
     }
