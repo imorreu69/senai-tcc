@@ -13,7 +13,7 @@ router.post('/login', async (req, res) => {
 
         const { data, error } = await supabase
             .from('tb_usuario')
-            .select('id, nome, email, perfil')
+            .select('nome, email, perfil')
             .eq('email', email.trim().toLowerCase())
             .eq('senha', senha)
             .eq('perfil', perfil)
@@ -47,7 +47,7 @@ router.post('/register', async (req, res) => {
                 perfil: 'USUARIO',
                 palavra_seguranca: palavra_seguranca.trim().toLowerCase()
             }])
-            .select('id, nome, email, perfil')
+            .select('nome, email, perfil')
             .single();
 
         if (error) {
@@ -72,10 +72,12 @@ router.patch('/reset-password', async (req, res) => {
             return res.status(400).json({ error: 'Informe e-mail, palavra de segurança e a nova senha.' });
         }
 
+        const emailLimpo = email.trim().toLowerCase();
+
         const { data: usuario, error: buscaError } = await supabase
             .from('tb_usuario')
-            .select('id')
-            .eq('email', email.trim().toLowerCase())
+            .select('email')
+            .eq('email', emailLimpo)
             .eq('palavra_seguranca', palavra_seguranca.trim().toLowerCase())
             .single();
 
@@ -86,7 +88,7 @@ router.patch('/reset-password', async (req, res) => {
         const { error: updateError } = await supabase
             .from('tb_usuario')
             .update({ senha: nova_senha })
-            .eq('id', usuario.id);
+            .eq('email', emailLimpo);
 
         if (updateError) {
             return res.status(500).json({ error: 'Falha ao atualizar a senha.' });
