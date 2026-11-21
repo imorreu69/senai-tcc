@@ -30,37 +30,93 @@
 <body class="bg-white text-slate-900 dark:bg-[#0a0906] dark:text-slate-100 min-h-screen flex flex-col antialiased">
 
     <!-- TELA DE LOGIN -->
-    <div id="login-screen" class="fixed inset-0 z-[100] bg-[#0a0906] flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-[28px] p-8 space-y-6 shadow-2xl border border-slate-200 dark:border-slate-700">
-            <div class="text-center space-y-3">
-                <svg width="48" height="48" viewBox="0 0 34 34" fill="none" class="mx-auto">
-                    <path d="M8 5v12.5a6.5 6.5 0 0 0 13 0" stroke="#ff931e" stroke-width="5" stroke-linecap="round"/>
-                    <ellipse cx="8" cy="11.5" rx="5.5" ry="1.6" fill="#36a9e1"/>
-                </svg>
-                <h2 class="text-2xl font-astonpoliz font-bold text-slate-900 dark:text-white leading-tight">acesso ao sistema<span class="text-[#ff931e]">.</span></h2>
-            </div>
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-xs font-semibold">
-                <div>
-                    <label class="block text-slate-700 dark:text-slate-300 mb-1">Perfil de Acesso</label>
-                    <select id="login-role" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
-                        <option value="OPERADOR">Operador Master</option>
-                        <option value="USUARIO">Usuário Comum</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-slate-700 dark:text-slate-300 mb-1">E-mail corporativo</label>
-                    <input type="email" id="login-email" value="admin@urbanlink.com" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
-                </div>
-                <div>
-                    <label class="block text-slate-700 dark:text-slate-300 mb-1">Senha</label>
-                    <input type="password" id="login-password" value="123456" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
-                </div>
-                <button type="submit" class="w-full py-3 mt-2 bg-[#36a9e1] hover:bg-[#2b8cc0] text-white font-bold rounded-full transition-all text-sm">
-                    Entrar na Plataforma
-                </button>
-            </form>
+<div id="login-screen" class="fixed inset-0 z-[100] bg-[#0a0906] flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-[28px] p-8 space-y-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+        <div class="text-center space-y-3">
+            <svg width="48" height="48" viewBox="0 0 34 34" fill="none" class="mx-auto">
+                <path d="M8 5v12.5a6.5 6.5 0 0 0 13 0" stroke="#ff931e" stroke-width="5" stroke-linecap="round"/>
+                <ellipse cx="8" cy="11.5" rx="5.5" ry="1.6" fill="#36a9e1"/>
+            </svg>
+            <h2 id="auth-title" class="text-2xl font-astonpoliz font-bold text-slate-900 dark:text-white leading-tight">
+                acesso ao sistema<span class="text-[#ff931e]">.</span>
+            </h2>
         </div>
+
+        <!-- 1. SEU FORMULÁRIO DE LOGIN ORIGINAL -->
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 text-xs font-semibold">
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Perfil de Acesso</label>
+                <select id="login-role" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+                    <option value="OPERADOR">Operador Master</option>
+                    <option value="USUARIO">Usuário Comum</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">E-mail corporativo</label>
+                <input type="email" id="login-email" value="admin@urbanlink.com" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Senha</label>
+                <input type="password" id="login-password" value="123456" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <button type="submit" class="w-full py-3 mt-2 bg-[#36a9e1] hover:bg-[#2b8cc0] text-white font-bold rounded-full transition-all text-sm">
+                Entrar na Plataforma
+            </button>
+            <div class="flex justify-between pt-2 text-xs">
+                <a href="#" onclick="alternarTelaAuth('register'); return false;" class="text-[#36a9e1] hover:underline">Criar conta</a>
+                <a href="#" onclick="alternarTelaAuth('reset'); return false;" class="text-[#ff931e] hover:underline">Esqueci minha senha</a>
+            </div>
+        </form>
+
+        <!-- 2. NOVO FORMULÁRIO DE CADASTRO -->
+        <form id="form-register" class="hidden space-y-4 text-xs font-semibold">
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Nome completo</label>
+                <input type="text" id="reg-nome" placeholder="Ex: Carlos Silva" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">E-mail corporativo</label>
+                <input type="email" id="reg-email" placeholder="seu@email.com" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Senha</label>
+                <input type="password" id="reg-senha" placeholder="Crie uma senha" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Palavra de segurança (para recuperar senha)</label>
+                <input type="text" id="reg-palavra" placeholder="Ex: nome do primeiro pet" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <button type="submit" class="w-full py-3 mt-2 bg-[#ff931e] hover:bg-[#e07e12] text-white font-bold rounded-full transition-all text-sm">
+                Finalizar Cadastro
+            </button>
+            <div class="text-center pt-2">
+                <a href="#" onclick="alternarTelaAuth('login'); return false;" class="text-slate-400 hover:text-white">Voltar para o Login</a>
+            </div>
+        </form>
+
+        <!-- 3. NOVO FORMULÁRIO ESQUECI A SENHA -->
+        <form id="form-reset" class="hidden space-y-4 text-xs font-semibold">
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">E-mail cadastrado</label>
+                <input type="email" id="reset-email" placeholder="seu@email.com" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Sua palavra de segurança</label>
+                <input type="text" id="reset-palavra" placeholder="Palavra informada no cadastro" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+                <label class="block text-slate-700 dark:text-slate-300 mb-1">Nova senha</label>
+                <input type="password" id="reset-nova-senha" placeholder="Digite a nova senha" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-200">
+            </div>
+            <button type="submit" class="w-full py-3 mt-2 bg-[#36a9e1] hover:bg-[#2b8cc0] text-white font-bold rounded-full transition-all text-sm">
+                Redefinir Senha
+            </button>
+            <div class="text-center pt-2">
+                <a href="#" onclick="alternarTelaAuth('login'); return false;" class="text-slate-400 hover:text-white">Voltar para o Login</a>
+            </div>
+        </form>
     </div>
+</div>
 
     <!-- TOP NAVIGATION BAR -->
     <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#0a0906]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 lg:px-8 py-3">

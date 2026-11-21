@@ -185,3 +185,114 @@ function exportCSV() {
     a.click();
     showToast('CSV Exportado!', 'success');
 }
+// Alterna entre Login, Cadastro e Redefinição de Senha
+function alternarTelaAuth(tela) {
+    const formLogin = document.getElementById('login-form'); // ajuste para o ID do seu form de login atual
+    const formRegister = document.getElementById('form-register');
+    const formReset = document.getElementById('form-reset');
+
+    if (formLogin) formLogin.style.display = tela === 'login' ? 'flex' : 'none';
+    if (formRegister) formRegister.style.display = tela === 'register' ? 'flex' : 'none';
+    if (formReset) formReset.style.display = tela === 'reset' ? 'flex' : 'none';
+}
+
+// Enviar Cadastro
+document.getElementById('form-register')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        nome: document.getElementById('reg-nome').value,
+        email: document.getElementById('reg-email').value,
+        perfil: document.getElementById('reg-perfil').value,
+        senha: document.getElementById('reg-senha').value,
+        palavra_seguranca: document.getElementById('reg-palavra').value
+    };
+
+    const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (!res.ok) return alert(data.error || 'Erro ao cadastrar.');
+    alert('Cadastro realizado com sucesso! Faça login.');
+    e.target.reset();
+    alternarTelaAuth('login');
+});
+
+// Enviar Redefinição de Senha
+document.getElementById('form-reset')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        email: document.getElementById('reset-email').value,
+        palavra_seguranca: document.getElementById('reset-palavra').value,
+        nova_senha: document.getElementById('reset-nova-senha').value
+    };
+
+    const res = await fetch(`${API_URL}/reset-password`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (!res.ok) return alert(data.error || 'Erro ao redefinir senha.');
+    alert('Senha alterada com sucesso! Entre com a nova senha.');
+    e.target.reset();
+    alternarTelaAuth('login');
+});
+function alternarTelaAuth(tela) {
+    const titulos = {
+        login: 'acesso ao sistema<span class="text-[#ff931e]">.</span>',
+        register: 'criar nova conta<span class="text-[#ff931e]">.</span>',
+        reset: 'recuperar senha<span class="text-[#ff931e]">.</span>'
+    };
+
+    document.getElementById('auth-title').innerHTML = titulos[tela];
+    document.getElementById('login-form').classList.toggle('hidden', tela !== 'login');
+    document.getElementById('form-register').classList.toggle('hidden', tela !== 'register');
+    document.getElementById('form-reset').classList.toggle('hidden', tela !== 'reset');
+}
+
+document.getElementById('form-register')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        nome: document.getElementById('reg-nome').value,
+        email: document.getElementById('reg-email').value,
+        senha: document.getElementById('reg-senha').value,
+        palavra_seguranca: document.getElementById('reg-palavra').value
+    };
+
+    const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (!res.ok) return alert(data.error || 'Erro ao cadastrar.');
+    alert('Conta criada com sucesso! Selecione "Usuário Comum" para entrar.');
+    e.target.reset();
+    alternarTelaAuth('login');
+});
+
+document.getElementById('form-reset')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        email: document.getElementById('reset-email').value,
+        palavra_seguranca: document.getElementById('reset-palavra').value,
+        nova_senha: document.getElementById('reset-nova-senha').value
+    };
+
+    const res = await fetch(`${API_URL}/reset-password`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (!res.ok) return alert(data.error || 'Erro ao redefinir senha.');
+    alert('Senha alterada com sucesso!');
+    e.target.reset();
+    alternarTelaAuth('login');
+});
