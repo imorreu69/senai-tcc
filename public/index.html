@@ -2,50 +2,46 @@
 <html lang="pt-BR" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>urbanlink. urbanflow. — Logística urbana sob controle</title>
     <meta name="description" content="Plataforma de gestão e simulação de logística urbana: otimização de rotas, mapa em tempo real, simulação de cenários e gestão de entregas em um só lugar.">
 
-    <!-- Tailwind CSS & Custom Brand Config (mesmo config do painel) -->
+    <!-- Tailwind CSS & Custom Brand Config -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/tailwind-config.js"></script>
 
     <!-- Google Fonts: Baloo 2 + Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <!-- FontAwesome (ícones do checklist e do botão de tema) -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Estilos compartilhados com o painel -->
+    <!-- Estilos compartilhados -->
     <link rel="stylesheet" href="css/style.css" />
 
     <style>
-        html { scroll-behavior: smooth; }
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .font-brand { font-family: 'Baloo 2', cursive, sans-serif; }
 
-        /* Trilho de rota: a linha pontilhada que liga os hubs no hero e no mockup —
-           é o motivo "os portais" (tubo + conexão) do manual, reaproveitado como
-           elemento estrutural em vez de decoração solta. */
         .route-dash {
             stroke-dasharray: 7 7;
-            animation: route-flow 14s linear infinite;
+            animation: route-flow 12s linear infinite;
         }
         @keyframes route-flow {
             to { stroke-dashoffset: -280; }
         }
-        @media (prefers-reduced-motion: reduce) {
-            .route-dash { animation: none; }
-        }
 
-        /* Faixa de tecnologias: rolagem contínua */
         .marquee-track {
             display: flex;
             width: max-content;
             animation: marquee-scroll 28s linear infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .marquee-track { animation: none; }
         }
         @keyframes marquee-scroll {
             from { transform: translateX(0); }
@@ -55,380 +51,265 @@
         .feature-anchor { scroll-margin-top: 96px; }
     </style>
 </head>
-<body class="bg-white text-slate-900 dark:bg-[#0a0906] dark:text-slate-100 antialiased transition-colors duration-300">
+<body class="bg-[#fcfbf9] text-slate-900 dark:bg-[#0a0906] dark:text-slate-100 antialiased transition-colors duration-200">
 
     <!-- ========================================================= -->
-    <!-- CABEÇALHO                                                  -->
+    <!-- CABEÇALHO RESPONSIVO (DESKTOP + MOBILE)                   -->
     <!-- ========================================================= -->
-    <header class="sticky top-0 z-50 bg-white/90 dark:bg-[#0a0906]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 lg:px-10 py-4">
-        <div class="max-w-6xl mx-auto flex items-center justify-between gap-6">
-            <a href="home.html" class="flex items-center gap-2.5 shrink-0">
-                <svg width="26" height="26" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M8 5v12.5a6.5 6.5 0 0 0 13 0" stroke="#ff931e" stroke-width="5" stroke-linecap="round"/>
-                    <ellipse cx="8" cy="11.5" rx="5.5" ry="1.6" fill="#36a9e1"/>
+    <header class="sticky top-0 z-50 w-full bg-[#fcfbf9]/95 dark:bg-[#0a0906]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 lg:px-10 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-2 min-w-0">
+                <svg class="w-7 h-7 sm:w-8 sm:h-8 shrink-0" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 5v12.5a6.5 6.5 0 0 0 13 0" stroke="#ff931e" stroke-width="5.2" stroke-linecap="round"/>
+                    <ellipse cx="8" cy="11.5" rx="5.5" ry="1.8" fill="#36a9e1"/>
                 </svg>
-                <span class="flex items-center gap-1 font-astonpoliz text-xl leading-none">
+                <span class="flex items-center gap-1 font-brand font-bold text-lg sm:text-2xl tracking-tight leading-none truncate">
                     <span class="lowercase text-slate-900 dark:text-white">urbanlink<span class="text-[#36a9e1]">.</span></span>
                     <span class="lowercase text-slate-900 dark:text-white">urbanflow<span class="text-[#ff931e]">.</span></span>
                 </span>
             </a>
 
+            <!-- Menu Desktop -->
             <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300">
                 <a href="#produto" class="hover:text-slate-900 dark:hover:text-white transition-colors">Produto</a>
-                <a href="#como-funciona" class="hover:text-slate-900 dark:hover:text-white transition-colors">Como funciona</a>
-                
+                <a href="#funcionalidades" class="hover:text-slate-900 dark:hover:text-white transition-colors">Funcionalidades</a>
+                <a href="jogo.html" class="text-[#ff931e] font-bold flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+                    <i class="fa-solid fa-gamepad text-xs"></i> Jogo & itch.io
+                </a>
                 <a href="#projeto" class="hover:text-slate-900 dark:hover:text-white transition-colors">O projeto</a>
-                <a href="jogo.html" class="hover:text-[#ff931e] transition-colors flex items-center gap-1.5 font-semibold">
-    <i class="fa-solid fa-gamepad text-[#ff931e] text-xs"></i> Jogo & itch.io
-</a>
             </nav>
 
-            <div class="flex items-center gap-3 shrink-0">
-                <a href="login.html" class="hidden sm:inline text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors">Entrar</a>
-                <a href="index.html" class="px-4 py-2 rounded-full bg-[#0a0906] text-white dark:bg-white dark:text-[#0a0906] text-sm font-semibold hover:bg-[#2a241b] dark:hover:bg-slate-200 transition-colors">
-                    Ver a plataforma
+            <!-- Ações Direita -->
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="login.html" class="px-3.5 sm:px-5 py-2 rounded-full bg-[#0a0906] text-white dark:bg-white dark:text-[#0a0906] text-xs sm:text-sm font-semibold hover:bg-[#2a241b] transition-colors">
+                    Entrar
                 </a>
-                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-[#36a9e1] transition-all" title="Alternar tema" aria-label="Alternar entre modo claro e escuro">
-                    <i class="fa-solid fa-sun text-amber-500 dark:hidden"></i>
-                    <i class="fa-solid fa-moon text-sky-400 hidden dark:block"></i>
+                <button onclick="toggleTheme()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center justify-center" title="Alternar tema">
+                    <i class="fa-solid fa-sun text-amber-500 dark:hidden text-xs sm:text-sm"></i>
+                    <i class="fa-solid fa-moon text-sky-400 hidden dark:block text-xs sm:text-sm"></i>
                 </button>
             </div>
         </div>
+
+        <!-- Barra de Navegação Mobile (Sempre visível no celular) -->
+        <nav class="md:hidden flex items-center justify-around gap-1 pt-2.5 mt-2.5 border-t border-slate-200/80 dark:border-slate-800 text-xs font-semibold">
+            <a href="#produto" class="px-2 py-1 text-slate-600 dark:text-slate-300">Painel</a>
+            <a href="jogo.html" class="px-2.5 py-1 rounded-full bg-[#ff931e]/15 text-[#ff931e] font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-gamepad"></i> Jogo & itch.io
+            </a>
+            <a href="login.html" class="px-2 py-1 text-[#36a9e1] font-bold">Login / Cadastro</a>
+        </nav>
     </header>
 
-    <main>
+    <main class="w-full overflow-x-hidden">
 
         <!-- ========================================================= -->
         <!-- HERO                                                       -->
         <!-- ========================================================= -->
-        <section class="max-w-6xl mx-auto px-5 lg:px-10 pt-14 md:pt-20 pb-16 grid grid-cols-1 lg:grid-cols-[1fr_0.95fr] gap-12 items-center">
-            <div class="space-y-6">
-                <p class="text-sm font-semibold text-[#36a9e1]">Painel de controle para logística urbana</p>
-                <h1 class="font-astonpoliz text-[2.6rem] sm:text-6xl leading-[1.04] text-slate-900 dark:text-white">
-                    O fluxo da<br>cidade, sob<br>controle<span class="text-[#ff931e]">.</span>
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pt-10 md:pt-20 pb-16 grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
+            <div class="space-y-5 min-w-0">
+                <p class="text-xs sm:text-sm font-semibold text-[#36a9e1] tracking-wide">painel de controle para logística urbana</p>
+
+                <h1 class="font-brand font-extrabold text-4xl sm:text-6xl leading-[1.05] tracking-tight text-slate-900 dark:text-white break-words">
+                    O fluxo da cidade, sob controle<span class="text-[#ff931e]">.</span>
                 </h1>
-                <p class="text-base text-slate-600 dark:text-slate-300 max-w-md leading-relaxed">
+
+                <p class="text-sm sm:text-lg text-slate-600 dark:text-slate-300 max-w-lg leading-relaxed">
                     Urbanlink Flow reúne otimização de rotas, mapa ao vivo e simulação de cenários num só painel, para que cada hub saiba exatamente para onde cada entrega vai — e quanto isso custa.
                 </p>
-                <div class="flex flex-wrap items-center gap-4 pt-2">
-                    <a href="index.html" class="px-6 py-3 rounded-full bg-[#ff931e] hover:bg-[#e07f12] text-white font-semibold text-sm transition-colors">
-                        Ver a plataforma
+
+                <div class="flex flex-wrap items-center gap-3 pt-1">
+                    <a href="login.html" class="px-6 py-3 rounded-full bg-[#ff931e] hover:bg-[#e57f10] text-white font-semibold text-sm shadow-sm transition-colors">
+                        Acessar a plataforma
                     </a>
-                    <a href="#produto" class="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors">
-                        Como funciona
+                    <a href="jogo.html" class="px-5 py-3 rounded-full border border-slate-300 dark:border-slate-700 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-[#ff931e]"></i>
+                        <span>Jogar protótipo</span>
                     </a>
                 </div>
 
-                <div class="flex flex-wrap gap-x-8 gap-y-3 pt-6 border-t border-slate-200 dark:border-slate-800 mt-8">
+                <!-- Métricas responsivas sem estourar largura -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-8 pt-6 border-t border-slate-200 dark:border-slate-800 mt-6">
                     <div>
-                        <div class="font-astonpoliz text-2xl text-slate-900 dark:text-white">98,4%</div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400">Cumprimento de SLA</div>
+                        <div class="font-brand font-bold text-xl sm:text-3xl text-slate-900 dark:text-white">98,4%</div>
+                        <div class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">Cumprimento de SLA</div>
                     </div>
                     <div>
-                        <div class="font-astonpoliz text-2xl text-slate-900 dark:text-white">384,2 kg</div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400">CO₂ evitado por dia</div>
+                        <div class="font-brand font-bold text-xl sm:text-3xl text-[#36a9e1]">384,2 kg</div>
+                        <div class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">CO₂ evitado por dia</div>
                     </div>
                     <div>
-                        <div class="font-astonpoliz text-2xl text-slate-900 dark:text-white">42 / 50</div>
-                        <div class="text-xs text-slate-500 dark:text-slate-400">Veículos em operação</div>
+                        <div class="font-brand font-bold text-xl sm:text-3xl text-slate-900 dark:text-white">42 / 50</div>
+                        <div class="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight">Frota em operação</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Grafismo: malha de hubs conectados pela rota otimizada -->
-            <div class="relative aspect-square max-w-md mx-auto w-full">
-                <svg viewBox="0 0 320 320" class="w-full h-full" aria-hidden="true">
-                    <g stroke="#cabeaa" stroke-width="1" class="dark:opacity-40">
+            <!-- Grafismo SVG contido -->
+            <div class="relative w-full max-w-md mx-auto">
+                <svg viewBox="0 0 320 300" class="w-full h-auto" aria-hidden="true">
+                    <g stroke="#e2ddd5" stroke-width="1" class="dark:opacity-25">
                         <line x1="0" y1="60" x2="320" y2="60"/>
                         <line x1="0" y1="140" x2="320" y2="140"/>
                         <line x1="0" y1="220" x2="320" y2="220"/>
-                        <line x1="80" y1="0" x2="80" y2="320"/>
-                        <line x1="160" y1="0" x2="160" y2="320"/>
-                        <line x1="240" y1="0" x2="240" y2="320"/>
+                        <line x1="80" y1="0" x2="80" y2="300"/>
+                        <line x1="160" y1="0" x2="160" y2="300"/>
+                        <line x1="240" y1="0" x2="240" y2="300"/>
                     </g>
+
                     <path class="route-dash" d="M80 60 L160 140 L240 100 L240 220 L160 260"
                           fill="none" stroke="#ff931e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="80" cy="60" r="9" fill="#0a0906" class="dark:fill-white"/>
+
+                    <circle cx="80" cy="60" r="8" fill="#0a0906" class="dark:fill-white"/>
+                    <circle cx="160" cy="140" r="5" fill="#ff931e"/>
                     <circle cx="240" cy="100" r="6" fill="#36a9e1"/>
                     <circle cx="240" cy="220" r="6" fill="#36a9e1"/>
-                    <circle cx="160" cy="260" r="9" fill="#0a0906" class="dark:fill-white"/>
-                    <text x="92" y="56" font-size="11" fill="#685c49" font-family="Inter, sans-serif" class="dark:fill-slate-400">Hub central</text>
-                    <text x="172" y="276" font-size="11" fill="#685c49" font-family="Inter, sans-serif" class="dark:fill-slate-400">Entrega concluída</text>
+                    <circle cx="160" cy="260" r="8" fill="#ff931e"/>
+
+                    <text x="95" y="55" font-size="11" font-weight="600" fill="#64748b" font-family="Inter, sans-serif">Hub central</text>
+                    <text x="174" y="274" font-size="11" font-weight="600" fill="#64748b" font-family="Inter, sans-serif">Destino</text>
                 </svg>
-                <div class="absolute top-3 right-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2 shadow-[0_8px_24px_-12px_rgba(10,9,6,0.25)]">
-                    <div class="text-[10px] text-slate-500 dark:text-slate-400">Rota otimizada</div>
-                    <div class="text-sm font-bold text-[#36a9e1]">8,4 km · 19 min</div>
+
+                <div class="absolute top-3 right-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2 shadow-sm">
+                    <div class="text-[10px] text-slate-400">Rota otimizada</div>
+                    <div class="text-xs sm:text-sm font-bold text-[#36a9e1]">8,4 km · 19 min</div>
                 </div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- FAIXA DE POSICIONAMENTO (fundo ink, igual em ambos os temas) -->
+        <!-- VISÃO GERAL DO PRODUTO                                     -->
         <!-- ========================================================= -->
-        <section class="bg-[#0a0906] text-white">
-            <div class="max-w-6xl mx-auto px-5 lg:px-10 py-16 grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-10 items-start">
-                <h2 class="font-astonpoliz text-3xl md:text-4xl leading-tight">
-                    Planilha e grupo de mensagens não escalam quando o hub cresce.
-                </h2>
-                <p class="text-slate-300 leading-relaxed max-w-md">
-                    Cada entrega atrasada, cada rota recalculada de cabeça e cada estoque de combustível estimado "no olho" é uma decisão que devia estar num painel, não numa planilha espalhada entre operadores. O Urbanlink Flow centraliza isso: uma fonte única de verdade para rotas, veículos e entregas.
-                </p>
-            </div>
-        </section>
-
-        <!-- ========================================================= -->
-        <!-- MOCKUP DO PRODUTO                                          -->
-        <!-- ========================================================= -->
-        <section id="produto" class="feature-anchor max-w-6xl mx-auto px-5 lg:px-10 py-20">
-            <div class="text-center max-w-xl mx-auto space-y-3 mb-10">
-                <p class="text-sm font-semibold text-[#36a9e1]">O painel</p>
-                <h2 class="font-astonpoliz text-3xl md:text-4xl text-slate-900 dark:text-white">Tudo o que um hub precisa ver, numa tela só</h2>
+        <section id="produto" class="feature-anchor max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-14">
+            <div class="text-center max-w-xl mx-auto space-y-2 mb-8">
+                <p class="text-xs font-semibold text-[#36a9e1]">o sistema</p>
+                <h2 class="font-brand font-bold text-2xl sm:text-4xl text-slate-900 dark:text-white">Tudo o que um hub precisa ver, numa tela só</h2>
             </div>
 
-            <div class="rounded-[28px] border border-slate-200 dark:border-slate-700 shadow-[0_30px_60px_-30px_rgba(10,9,6,0.25)] overflow-hidden">
-                <div class="bg-slate-100 dark:bg-slate-800 px-4 py-3 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+            <div class="rounded-[24px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg overflow-hidden">
+                <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2.5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
                     <span class="w-2.5 h-2.5 rounded-full bg-[#ff931e]"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-[#36a9e1]"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600"></span>
-                    <span class="ml-3 text-xs text-slate-500 dark:text-slate-400">urbanlink.app/painel</span>
+                    <span class="ml-2 text-[11px] font-mono text-slate-400 truncate">app.urbanlinkflow.io/painel</span>
                 </div>
-                <div class="bg-white dark:bg-slate-900 p-5 md:p-8 grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-5">
-                    <div class="grid grid-cols-2 gap-4">
+
+                <div class="p-4 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div class="bg-[#0a0906] rounded-2xl p-4">
                             <p class="text-[11px] text-slate-400">Entregas hoje</p>
-                            <p class="font-astonpoliz text-2xl text-white mt-1">1.482</p>
+                            <p class="font-brand font-bold text-2xl text-white mt-1">1.482</p>
                         </div>
                         <div class="bg-[#ff931e] rounded-2xl p-4">
-                            <p class="text-[11px] text-white/80">Frota em trânsito</p>
-                            <p class="font-astonpoliz text-2xl text-white mt-1">42 / 50</p>
+                            <p class="text-[11px] text-white/80">Frota ativa</p>
+                            <p class="font-brand font-bold text-2xl text-white mt-1">42 / 50</p>
                         </div>
                         <div class="bg-white dark:bg-slate-800 border-2 border-[#0a0906] dark:border-slate-200 rounded-2xl p-4">
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">SLA</p>
-                            <p class="font-astonpoliz text-2xl text-slate-900 dark:text-white mt-1">98,4%</p>
+                            <p class="text-[11px] text-slate-500">SLA</p>
+                            <p class="font-brand font-bold text-2xl text-slate-900 dark:text-white mt-1">98,4%</p>
                         </div>
                         <div class="bg-[#36a9e1] rounded-2xl p-4">
                             <p class="text-[11px] text-white/80">CO₂ evitado</p>
-                            <p class="font-astonpoliz text-2xl text-white mt-1">384 kg</p>
+                            <p class="font-brand font-bold text-2xl text-white mt-1">384 kg</p>
                         </div>
                     </div>
-                    <div class="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 flex flex-col justify-between">
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">Mapa de hubs e veículos</p>
-                        <svg viewBox="0 0 200 110" class="w-full h-auto">
-                            <rect width="200" height="110" rx="10" fill="#f1ede6"/>
-                            <path d="M20 85 Q 70 20 110 55 T 180 30" stroke="#ff931e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                            <circle cx="20" cy="85" r="5" fill="#0a0906"/>
+
+                    <div class="bg-[#fcfbf9] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col justify-between">
+                        <p class="text-xs font-semibold text-slate-500 mb-2">Mapa ao vivo · Hubs conectados</p>
+                        <svg viewBox="0 0 220 110" class="w-full h-auto rounded-lg">
+                            <rect width="220" height="110" rx="8" fill="#f1ede6"/>
+                            <path d="M30 85 Q 80 20 110 55 T 190 30" stroke="#ff931e" stroke-width="3" fill="none"/>
+                            <circle cx="30" cy="85" r="5" fill="#0a0906"/>
                             <circle cx="110" cy="55" r="4" fill="#36a9e1"/>
-                            <circle cx="180" cy="30" r="5" fill="#0a0906"/>
+                            <circle cx="190" cy="30" r="5" fill="#0a0906"/>
                         </svg>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2">3 veículos ativos · Hub central</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- FUNCIONALIDADES (linhas alternadas)                        -->
+        <!-- SEÇÃO DO JOGO & ITCH.IO NA HOME                           -->
         <!-- ========================================================= -->
-        <section class="max-w-6xl mx-auto px-5 lg:px-10 py-8 space-y-20 md:space-y-28">
-
-            <!-- Otimizador -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="space-y-4 order-2 md:order-1">
-                    <p class="text-xs font-semibold text-[#ff931e]">Otimizador de rotas</p>
-                    <h3 class="font-astonpoliz text-2xl md:text-3xl text-slate-900 dark:text-white">A menor rota, calculada, não adivinhada</h3>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
-                        Escolha o hub de origem, o destino e o veículo: o motor calcula a distância pela fórmula de Haversine, aplica a penalidade de trânsito do momento e devolve tempo estimado e CO₂ evitado — antes de o veículo sair da garagem.
+        <section id="funcionalidades" class="feature-anchor max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-10">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="space-y-2 max-w-xl">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-[#ff931e]">
+                        <i class="fa-solid fa-gamepad"></i> Simulador Gamificado
+                    </span>
+                    <h2 class="font-brand font-bold text-2xl sm:text-3xl text-slate-900 dark:text-white">
+                        Experimente o desafio de rotas Urbanlink
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Teste sua lógica de roteirização conectando cargas aos destinos na grade urbana diretamente no navegador ou acesse a página oficial publicada no <strong>itch.io</strong>.
                     </p>
                 </div>
-                <div class="order-1 md:order-2 bg-slate-50 dark:bg-slate-800/60 rounded-[28px] p-8 flex items-center justify-center">
-                    <svg viewBox="0 0 220 160" class="w-full max-w-xs">
-                        <circle cx="40" cy="120" r="8" fill="#0a0906" class="dark:fill-white"/>
-                        <circle cx="180" cy="40" r="8" fill="#36a9e1"/>
-                        <path d="M40 120 L110 100 L140 60 L180 40" stroke="#ff931e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 10"/>
-                        <path d="M40 120 Q 110 140 180 40" stroke="#cabeaa" stroke-width="2" fill="none" stroke-dasharray="4 6"/>
-                        <text x="12" y="140" font-size="10" fill="#685c49" font-family="Inter, sans-serif" class="dark:fill-slate-400">Hub</text>
-                        <text x="160" y="30" font-size="10" fill="#685c49" font-family="Inter, sans-serif" class="dark:fill-slate-400">Destino</text>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Mapa em tempo real -->
-            <div id="como-funciona" class="feature-anchor grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="bg-slate-50 dark:bg-slate-800/60 rounded-[28px] p-8 flex items-center justify-center">
-                    <svg viewBox="0 0 220 160" class="w-full max-w-xs">
-                        <rect x="10" y="10" width="200" height="140" rx="14" fill="#f1ede6"/>
-                        <circle cx="60" cy="100" r="7" fill="#36a9e1"/>
-                        <circle cx="140" cy="60" r="7" fill="#36a9e1"/>
-                        <circle cx="100" cy="40" r="9" fill="#0a0906"/>
-                        <g stroke="#cabeaa" stroke-width="1.5" stroke-dasharray="2 5">
-                            <line x1="100" y1="40" x2="60" y2="100"/>
-                            <line x1="100" y1="40" x2="140" y2="60"/>
-                        </g>
-                    </svg>
-                </div>
-                <div class="space-y-4">
-                    <p class="text-xs font-semibold text-[#36a9e1]">Mapa em tempo real</p>
-                    <h3 class="font-astonpoliz text-2xl md:text-3xl text-slate-900 dark:text-white">Cada veículo, visível no momento em que se move</h3>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
-                        O mapa em Leaflet mostra hubs e veículos lado a lado, com a posição de cada entrega atualizada automaticamente. Clique em qualquer ponto para ver o histórico e quem é o responsável por aquela movimentação.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Simulador -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="space-y-4 order-2 md:order-1">
-                    <p class="text-xs font-semibold text-[#ff931e]">Simulador de cenários</p>
-                    <h3 class="font-astonpoliz text-2xl md:text-3xl text-slate-900 dark:text-white">Teste a frota antes da chuva chegar</h3>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
-                        Ajuste trânsito, clima, tamanho da frota e volume de pedidos e veja, na hora, o impacto projetado no SLA e no atraso médio — útil para decidir se vale a pena reforçar a frota antes de uma sexta-feira chuvosa.
-                    </p>
-                </div>
-                <div class="order-1 md:order-2 bg-slate-50 dark:bg-slate-800/60 rounded-[28px] p-8 flex items-center justify-center">
-                    <svg viewBox="0 0 220 140" class="w-full max-w-xs">
-                        <g stroke="#cabeaa" stroke-width="1">
-                            <line x1="0" y1="110" x2="220" y2="110"/>
-                        </g>
-                        <rect x="20" y="70" width="18" height="40" rx="3" fill="#36a9e1"/>
-                        <rect x="55" y="40" width="18" height="70" rx="3" fill="#36a9e1"/>
-                        <rect x="90" y="20" width="18" height="90" rx="3" fill="#ff931e"/>
-                        <rect x="125" y="55" width="18" height="55" rx="3" fill="#ff931e"/>
-                        <rect x="160" y="80" width="18" height="30" rx="3" fill="#cabeaa"/>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Gestão / CRUD -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="bg-slate-50 dark:bg-slate-800/60 rounded-[28px] p-8 flex items-center justify-center">
-                    <div class="w-full max-w-xs bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden text-[10px]">
-                        <div class="grid grid-cols-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-semibold px-3 py-2">
-                            <span>Cliente</span><span>Hub</span><span>Status</span>
-                        </div>
-                        <div class="grid grid-cols-3 px-3 py-2 border-t border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-200">
-                            <span>Hospital das Clínicas</span><span>Central</span><span class="text-[#1d7ab0] dark:text-[#36a9e1]">Em trânsito</span>
-                        </div>
-                        <div class="grid grid-cols-3 px-3 py-2 border-t border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-200">
-                            <span>Loggi Distribuição</span><span>Oeste</span><span class="text-[#c96f00] dark:text-[#ff931e]">Pendente</span>
-                        </div>
-                        <div class="grid grid-cols-3 px-3 py-2 border-t border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-200">
-                            <span>Itaú Unibanco HQ</span><span>Sul</span><span class="text-emerald-700 dark:text-emerald-400">Concluído</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <p class="text-xs font-semibold text-[#36a9e1]">Gestão de entregas</p>
-                    <h3 class="font-astonpoliz text-2xl md:text-3xl text-slate-900 dark:text-white">Cadastre, edite e acompanhe sem planilha</h3>
-                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
-                        Cadastro completo de entregas com busca, filtro por hub e status, e histórico de quem alterou o quê. O operador vê tudo; o usuário comum acompanha só o que importa pra ele.
-                    </p>
+                <div class="flex flex-wrap gap-3 shrink-0">
+                    <a href="jogo.html" class="px-5 py-3 rounded-full bg-[#0a0906] text-white dark:bg-white dark:text-[#0a0906] text-xs sm:text-sm font-bold hover:opacity-90 transition-opacity flex items-center gap-2">
+                        <i class="fa-solid fa-play text-[#ff931e]"></i>
+                        <span>Abrir Página do Jogo</span>
+                    </a>
                 </div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- TECNOLOGIA (faixa com rolagem)                             -->
+        <!-- TECNOLOGIA (CONTIDA SEM ESTOURAR LARGURA)                 -->
         <!-- ========================================================= -->
-        
-
-        <!-- ========================================================= -->
-        <!-- COMO FUNCIONA EM 3 PASSOS                                  -->
-        <!-- ========================================================= -->
-        <section class="max-w-6xl mx-auto px-5 lg:px-10 py-20">
-            <h2 class="font-astonpoliz text-3xl md:text-4xl text-slate-900 dark:text-white mb-10 max-w-lg">Do cadastro ao mapa, em três passos</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="space-y-3 border-t-2 border-[#0a0906] dark:border-white pt-5">
-                    <div class="font-astonpoliz text-sm text-[#ff931e]">01</div>
-                    <h3 class="font-astonpoliz text-xl text-slate-900 dark:text-white">Cadastre hubs e veículos</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Defina os centros de distribuição e a frota disponível, elétrica ou convencional.</p>
-                </div>
-                <div class="space-y-3 border-t-2 border-[#0a0906] dark:border-white pt-5">
-                    <div class="font-astonpoliz text-sm text-[#ff931e]">02</div>
-                    <h3 class="font-astonpoliz text-xl text-slate-900 dark:text-white">Registre a entrega</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">O otimizador calcula a rota, o tempo e o CO₂ evitado antes de confirmar.</p>
-                </div>
-                <div class="space-y-3 border-t-2 border-[#0a0906] dark:border-white pt-5">
-                    <div class="font-astonpoliz text-sm text-[#ff931e]">03</div>
-                    <h3 class="font-astonpoliz text-xl text-slate-900 dark:text-white">Acompanhe no painel</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Mapa, indicadores e histórico atualizados em tempo real para toda a equipe.</p>
-                </div>
+        <section class="w-full overflow-hidden border-y border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-7 my-8">
+            <div class="marquee-track gap-10 pr-10 items-center text-sm sm:text-lg font-brand font-bold text-slate-400">
+                <span class="shrink-0">Node.js</span><span class="text-[#ff931e]">•</span>
+                <span class="shrink-0">Express REST</span><span class="text-[#36a9e1]">•</span>
+                <span class="shrink-0">PostgreSQL · Supabase</span><span class="text-[#ff931e]">•</span>
+                <span class="shrink-0">Leaflet.js</span><span class="text-[#36a9e1]">•</span>
+                <span class="shrink-0">Tailwind CSS</span><span class="text-[#ff931e]">•</span>
+                <span class="shrink-0">Vercel</span><span class="text-[#36a9e1]">•</span>
+                <span class="shrink-0">Node.js</span><span class="text-[#ff931e]">•</span>
+                <span class="shrink-0">Express REST</span><span class="text-[#36a9e1]">•</span>
+                <span class="shrink-0">PostgreSQL · Supabase</span><span class="text-[#ff931e]">•</span>
+                <span class="shrink-0">Leaflet.js</span><span class="text-[#36a9e1]">•</span>
+                <span class="shrink-0">Tailwind CSS</span><span class="text-[#ff931e]">•</span>
+                <span class="shrink-0">Vercel</span><span class="text-[#36a9e1]">•</span>
             </div>
-        </section>
-
-        <!-- ========================================================= -->
-        <!-- O PROJETO                                                  -->
-        <!-- ========================================================= -->
-        <section id="projeto" class="feature-anchor max-w-6xl mx-auto px-5 lg:px-10 py-20 grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-12">
-            <div class="space-y-4">
-                <p class="text-sm font-semibold text-[#36a9e1]">O projeto</p>
-                <h2 class="font-astonpoliz text-3xl text-slate-900 dark:text-white">Um projeto integrador, pensado como produto real</h2>
-                <p class="text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
-                    Urbanlink Flow é o Trabalho de Conclusão de Curso do Técnico em Desenvolvimento de Sistemas do SENAI: front-end, back-end e banco de dados construídos do zero, para a empresa fictícia UrbanLink Systems.
-                </p>
-            </div>
-            <ul class="space-y-4">
-                <li class="flex items-start gap-3">
-                    <i class="fa-solid fa-check text-[#36a9e1] mt-1"></i>
-                    <span class="text-sm text-slate-700 dark:text-slate-200">API REST documentada, com rotas separadas por responsabilidade</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="fa-solid fa-check text-[#36a9e1] mt-1"></i>
-                    <span class="text-sm text-slate-700 dark:text-slate-200">Banco de dados relacional normalizado (PostgreSQL via Supabase)</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="fa-solid fa-check text-[#36a9e1] mt-1"></i>
-                    <span class="text-sm text-slate-700 dark:text-slate-200">Perfis de acesso separados para operador e usuário comum</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="fa-solid fa-check text-[#36a9e1] mt-1"></i>
-                    <span class="text-sm text-slate-700 dark:text-slate-200">Projeto de código aberto, versionado no GitHub</span>
-                </li>
-            </ul>
         </section>
 
         <!-- ========================================================= -->
         <!-- CTA FINAL                                                  -->
         <!-- ========================================================= -->
-        <section class="bg-[#ff931e]">
-            <div class="max-w-6xl mx-auto px-5 lg:px-10 py-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <h2 class="font-astonpoliz text-3xl md:text-4xl text-white max-w-lg leading-tight">
-                    Veja o painel funcionando com dados de verdade.
-                </h2>
-                <a href="login.html" class="shrink-0 px-6 py-3 rounded-full bg-[#0a0906] text-white font-semibold text-sm hover:bg-[#2a241b] transition-colors">
-                    Entrar na plataforma
+        <section id="projeto" class="feature-anchor max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-16">
+            <div class="bg-[#ff931e] rounded-[28px] p-7 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="space-y-2 max-w-lg">
+                    <h2 class="font-brand font-extrabold text-2xl sm:text-4xl text-white leading-tight">
+                        Explore o painel ou crie sua conta.
+                    </h2>
+                    <p class="text-white/90 text-xs sm:text-sm">
+                        Demonstração pronta com dados reais no Supabase e mapas interativos.
+                    </p>
+                </div>
+                <a href="login.html" class="px-6 py-3.5 rounded-full bg-[#0a0906] text-white font-semibold text-xs sm:text-sm hover:bg-[#2a241b] transition-colors shrink-0">
+                    Ir para Login / Cadastro
                 </a>
             </div>
         </section>
     </main>
 
     <!-- ========================================================= -->
-    <!-- RODAPÉ (fundo ink, igual em ambos os temas)                -->
+    <!-- RODAPÉ                                                     -->
     <!-- ========================================================= -->
-    <footer class="bg-[#0a0906] text-slate-400">
-        <div class="max-w-6xl mx-auto px-5 lg:px-10 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
-            <div class="col-span-2 space-y-3">
-                <div class="flex items-center gap-2 font-astonpoliz text-lg text-white">
-                    <span class="lowercase">urbanlink<span class="text-[#36a9e1]">.</span></span>
-                    <span class="lowercase">urbanflow<span class="text-[#ff931e]">.</span></span>
+    <footer class="bg-[#0a0906] text-slate-400 border-t border-slate-800 px-4 sm:px-6 lg:px-10 py-10">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-xs">
+            <div class="space-y-1.5">
+                <div class="font-brand font-bold text-lg text-white">
+                    urbanlink<span class="text-[#36a9e1]">.</span> urbanflow<span class="text-[#ff931e]">.</span>
                 </div>
-                <p class="text-sm max-w-xs">Plataforma de gestão e simulação de logística urbana — TCC do curso Técnico em Desenvolvimento de Sistemas, SENAI.</p>
+                <p>Trabalho de Conclusão de Curso · Técnico em Desenvolvimento de Sistemas · SENAI</p>
             </div>
-            <div class="space-y-3 text-sm">
-                <p class="text-white font-semibold">Produto</p>
-                <a href="#produto" class="block hover:text-white transition-colors">O painel</a>
-                <a href="#como-funciona" class="block hover:text-white transition-colors">Mapa em tempo real</a>
-                <a href="index.html" class="block hover:text-white transition-colors">Entrar</a>
-            </div>
-            <div class="space-y-3 text-sm">
-                <p class="text-white font-semibold">Projeto</p>
-                <a href="#projeto" class="block hover:text-white transition-colors">Sobre o TCC</a>
-                <a href="#tecnologia" class="block hover:text-white transition-colors">Tecnologia</a>
-            </div>
-        </div>
-        <div class="border-t border-slate-800">
-            <div class="max-w-6xl mx-auto px-5 lg:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-                <span>© 2026 UrbanLink Systems — empresa fictícia, projeto acadêmico</span>
-                <span>Projeto Integrador SENAI</span>
+            <div class="flex flex-wrap gap-4 font-semibold">
+                <a href="index.html" class="hover:text-white">Início</a>
+                <a href="jogo.html" class="text-[#ff931e] hover:underline">Jogo & itch.io</a>
+                <a href="login.html" class="hover:text-white">Plataforma</a>
+                <a href="https://github.com/imorreu69/senai-tcc" target="_blank" rel="noopener noreferrer" class="hover:text-white">GitHub</a>
             </div>
         </div>
     </footer>
@@ -444,23 +325,7 @@
                 html.classList.add('dark');
             }
         }
-        
     </script>
-<script>
-    function toggleTheme() {
-        const html = document.documentElement;
-        if (html.classList.contains('dark')) {
-            html.classList.remove('dark');
-            html.classList.add('light');
-        } else {
-            html.classList.remove('light');
-            html.classList.add('dark');
-        }
-    }
 
-    function entrarNaPlataforma() {
-        window.location.href = '/login.html';
-    }
-</script>
 </body>
 </html>
