@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Urbanlink</title>
+<style>
+:root{--bg:#07041a;--cyan:#19f0ff;--mag:#ff2bd6;--yel:#ffe14a;--ink:#140a2a;--paper:#f4ecd8}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:#fff;font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;overflow:hidden}
+#bg{position:fixed;inset:0;background:
+  radial-gradient(circle at 20% 15%,rgba(255,43,214,.28),transparent 45%),
+  radial-gradient(circle at 85% 85%,rgba(25,240,255,.22),transparent 50%),
+  repeating-linear-gradient(0deg,rgba(25,240,255,.07) 0 1px,transparent 1px 38px),
+  repeating-linear-gradient(90deg,rgba(255,43,214,.06) 0 1px,transparent 1px 38px),var(--bg);z-index:0}
+#app{position:relative;z-index:1;max-width:460px;height:100dvh;margin:0 auto;display:flex;flex-direction:column;padding:8px 12px 10px}
+#hud{display:flex;justify-content:space-between;align-items:center;font-family:Consolas,monospace;font-size:12px;letter-spacing:1px;color:var(--cyan)}
+#hud b{color:var(--yel)}
+#mute{background:none;border:2px solid var(--cyan);color:var(--cyan);border-radius:8px;font-size:14px;padding:2px 8px;cursor:pointer}
+#bars{display:flex;justify-content:space-around;margin:8px 0 2px}
+.bar{display:flex;flex-direction:column;align-items:center;width:23%}
+.dot{height:14px;display:flex;align-items:center;justify-content:center}
+.dot i{display:block;background:#fff;border-radius:50%;box-shadow:0 0 8px #fff}
+.ring{width:56px;height:56px;border-radius:50%;border:3px solid #000;background:#1c1240;overflow:hidden;position:relative;box-shadow:3px 3px 0 var(--mag);transition:transform .2s}
+.fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(var(--cyan),#2b7bff);transition:height .5s}
+.ring span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:25px;filter:drop-shadow(1px 1px 0 #000)}
+.bar.danger .fill{background:linear-gradient(#ff7a7a,#ff2b4d)}
+.bar.flash .ring{transform:scale(1.18)}
+.nm{font-size:10.5px;margin-top:5px;text-transform:uppercase;letter-spacing:1px;color:#cfd3ff}
+#stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;min-height:0}
+#card{width:min(84vw,330px);height:min(52vh,400px);background:var(--paper);color:var(--ink);border:4px solid #000;border-radius:20px;
+  box-shadow:6px 6px 0 var(--mag),0 0 30px rgba(25,240,255,.35);display:flex;flex-direction:column;position:relative;overflow:hidden;
+  touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform}
+#card:active{cursor:grabbing}
+.co{background:var(--ink);color:var(--cyan);font-family:Consolas,monospace;font-size:12px;padding:6px 12px;letter-spacing:1.5px;text-transform:uppercase;display:flex;justify-content:space-between}
+.av{align-self:center;margin:14px 0 6px;width:96px;height:96px;border-radius:50%;border:4px solid #000;background:linear-gradient(135deg,var(--cyan),var(--mag));
+  display:flex;align-items:center;justify-content:center;font-size:54px;box-shadow:3px 3px 0 #000}
+.who{text-align:center;font-weight:900;font-size:16px}
+.txt{padding:8px 18px 14px;text-align:center;font-size:16.5px;line-height:1.35;flex:1;display:flex;align-items:center;justify-content:center}
+#choice{position:absolute;top:0;left:0;right:0;padding:10px 12px;background:rgba(20,10,42,.94);color:#fff;font-weight:800;font-size:15px;opacity:0;text-align:center;pointer-events:none;border-bottom:3px solid var(--cyan)}
+#choice.L{border-color:var(--mag);color:var(--mag)}
+#choice.R{border-color:var(--cyan);color:var(--cyan)}
+#learn{min-height:58px;background:rgba(255,255,255,.07);border-left:4px solid var(--yel);padding:8px 10px;font-size:12.5px;border-radius:8px;line-height:1.35;color:#e8eaff}
+#controls{display:flex;gap:10px;margin-top:8px}
+#controls button{flex:1;padding:10px 6px;font-weight:800;font-size:13px;border:3px solid #000;border-radius:12px;cursor:pointer;color:var(--ink);font-family:inherit;box-shadow:3px 3px 0 #000}
+#bL{background:var(--mag)}#bR{background:var(--cyan)}
+#controls button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+.ov{position:fixed;inset:0;background:rgba(5,3,20,.93);display:flex;align-items:center;justify-content:center;z-index:10;padding:16px}
+.ov.hide{display:none}
+.panel{max-width:420px;width:100%;max-height:96dvh;overflow:auto;background:#150b33;border:3px solid var(--cyan);border-radius:18px;padding:20px;box-shadow:6px 6px 0 var(--mag);text-align:center}
+.panel h1{margin:0;font-size:38px;letter-spacing:3px;color:var(--cyan);text-shadow:3px 3px 0 var(--mag)}
+.panel h2{margin:0 0 6px;color:var(--yel);text-shadow:2px 2px 0 #000}
+.panel .sub{font-family:Consolas,monospace;color:var(--mag);letter-spacing:2px;font-size:12px;margin:4px 0 12px;text-transform:uppercase}
+.panel p,.panel li{font-size:14px;line-height:1.45;color:#dfe2ff}
+.panel ul{text-align:left;padding-left:20px;margin:8px 0 14px}
+.btn{background:var(--yel);color:var(--ink);border:3px solid #000;border-radius:12px;padding:12px 22px;font-weight:900;font-size:15px;cursor:pointer;box-shadow:4px 4px 0 #000;font-family:inherit}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+.perk{display:block;width:100%;text-align:left;margin:8px 0;background:var(--paper);color:var(--ink);border:3px solid #000;border-radius:12px;padding:10px 12px;cursor:pointer;font-family:inherit;box-shadow:3px 3px 0 var(--mag)}
+.perk b{display:block;font-size:15px}.perk small{font-size:12.5px}
+.big{font-size:56px}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="app">
+  <div id="hud"><div>SEMANA <b id="wk">1</b> · CARTAS <b id="ct">0</b> · RECORDE <b id="bs">0</b></div><button id="mute" title="Som">🔊</button></div>
+  <div id="bars"></div>
+  <div id="stage">
+    <div id="card">
+      <div id="choice"></div>
+      <div class="co"><span id="co"></span><span>URBANLINK//</span></div>
+      <div class="av" id="av"></div>
+      <div class="who" id="who"></div>
+      <div class="txt" id="txt"></div>
+    </div>
+  </div>
+  <div id="learn">💡 Arraste a carta para os lados (ou use ← →) e mantenha as quatro barras longe de 0 e de 100.</div>
+  <div id="controls"><button id="bL"></button><button id="bR"></button></div>
+</div>
+
+<div class="ov" id="start"><div class="panel">
+  <div class="big">📦</div>
+  <h1>URBANLINK</h1>
+  <div class="sub">Simulador de logísticas</div>
+  <p>Você é o gerente recém-contratado da <b>UrbanLink</b>. Seu trabalho é ajudar empresas clientes a resolver seus problemas logísticos... e sobreviver o máximo de semanas possível.</p>
+  <ul>
+    <li>Arraste a carta para a <b>esquerda</b> ou <b>direita</b> para responder (ou use as setas / botões).</li>
+    <li>Cuide de <b>💰 Dinheiro</b>, <b>🏢 Empresas</b> (sua relação com os clientes), <b>🚚 Veículos</b> e <b>📣 Público</b> (opinião pública).</li>
+    <li>Se qualquer barra <b>esvaziar ou encher demais</b>, você perde.</li>
+    <li>Os recursos mudam sozinhos a cada turno. A cada 3 semanas você escolhe um <b>bônus</b>.</li>
+  </ul>
+  <button class="btn" id="go">COMEÇAR TURNO</button>
+</div></div>
+
+<div class="ov hide" id="bonus"><div class="panel">
+  <h2>⭐ Bônus da empresa!</h2>
+  <p>Semanas de trabalho renderam uma melhoria. Escolha uma:</p>
+  <div id="perks"></div>
+</div></div>
+
+<div class="ov hide" id="end"><div class="panel">
+  <div class="big" id="eIco">💥</div>
+  <h2 id="eTit"></h2>
+  <p id="eTxt"></p>
+  <p id="eLearn" style="border-left:4px solid var(--yel);padding-left:10px;text-align:left"></p>
+  <p>Você sobreviveu <b id="eWk"></b> semanas (<b id="eCt"></b> decisões).<br>Recorde: <b id="eBs"></b> semanas.</p>
+  <button class="btn" id="again">TENTAR DE NOVO</button>
+</div></div>
+
+<script>
+/* ---------- Dados ---------- */
+const RES={d:{n:"Dinheiro",i:"💰"},c:{n:"Empresas",i:"🏢"},v:{n:"Veículos",i:"🚚"},p:{n:"Público",i:"📣"}};
+const KEYS=["d","c","v","p"];
+const BASE_DRIFT={d:-1,c:-1,v:-1,p:-.5};
+
+/* C(empresa, personagem, avatar, texto, textoEsq, efeitoEsq, textoDir, efeitoDir, lição) */
+const C=(co,who,av,txt,lt,le,rt,re,learn)=>({co,who,av,txt,L:{t:lt,e:le},R:{t:rt,e:re},learn});
+const CARDS=[
+C("NeoMarket","Lia, gerente","🛍️","A Black Friday vem aí! Queremos todas as entregas em 24 horas.","Manter prazo normal",{c:-10,p:3,v:4},"Aceitar urgência",{d:12,v:-14,c:8},"Lead time é o tempo entre o pedido e a entrega. Picos de demanda exigem planejar a capacidade antes, não durante."),
+C("FreshBox","Chef Tonho","🥬","Entregamos alimentos frescos. Precisamos de caminhões refrigerados!","Recusar",{c:-8,d:4},"Alugar frigoríficos",{d:-12,v:10,c:8},"Cadeia do frio: transporte e armazenagem com temperatura controlada para preservar a qualidade."),
+C("MegaStore","Sr. Valdo","🏬","Quer fretes mais baratos? Junte as cargas de várias lojas em um só caminhão.","Entrega individual",{d:-8,p:5,c:3},"Consolidar cargas",{d:12,p:-6,v:4},"Consolidação de carga reduz o custo por unidade transportada, mas pode aumentar o tempo de entrega."),
+C("TechParts","Dra. Zhou","🔧","Não queremos estoque parado. Que tal peças 'just in time'?","Estoque de segurança",{d:-10,c:6},"Just in time",{d:12,c:-8},"Just in time reduz estoque, mas depende de fornecedores pontuais. O estoque de segurança protege contra imprevistos."),
+C("Entregadores","Zeca","🛵","Chefe, a galera da moto quer reajuste no valor por entrega.","Negar",{d:6,p:-14},"Reajustar",{d:-12,p:12},"A 'última milha' é a etapa mais cara e crítica da entrega, e depende de pessoas bem valorizadas."),
+C("GreenMove","Dra. Ana","🌱","Vamos eletrificar parte da frota?","Manter diesel",{p:-10,d:5},"Eletrificar",{v:12,d:-14,p:10},"Frota elétrica reduz emissões e custo por km, mas exige investimento em infraestrutura de recarga."),
+C("Oficina Interna","Dona Ruth","🧰","Os caminhões estão rangendo. Manutenção agora ou depois?","Depois",{d:6,v:-14},"Agora",{d:-10,v:16},"Manutenção preventiva custa menos que a corretiva: evita quebras e paradas inesperadas."),
+C("Rota Smart","Bit, o robô","🤖","Minha IA de roteirização promete cortar 20% dos quilômetros rodados.","Dispensar",{d:5,v:-8},"Contratar",{d:-12,v:10,c:4},"Roteirização escolhe o melhor caminho entre as paradas, economizando combustível, tempo e desgaste."),
+C("FarmaVida","Dr. Cabral","💊","Remédios exigem rastreamento total em tempo real.","Rastreio básico",{c:-10,d:5},"Rastreio total",{d:-8,c:10,p:4},"Rastreabilidade permite saber onde a carga está e em que condições, essencial para produtos sensíveis."),
+C("Loja Retorna","Mia","📦","Os clientes devolvem muita coisa. Montamos uma logística reversa?","Não",{p:-10,d:5},"Sim",{p:10,d:-8,v:-4},"Logística reversa cuida do caminho de volta: devoluções, reciclagem e reaproveitamento de produtos."),
+C("Prefeitura","Prefeito Gil","🏛️","Proibimos caminhões grandes no centro durante o dia.","Entregar à noite",{d:-8,p:-8,c:4},"Furgões menores",{d:-6,v:-8,p:8},"Restrições urbanas de circulação obrigam a adaptar horários e tamanho da frota."),
+C("Jornal da Rede","Kika, repórter","📰","Um pedido atrasou 3 dias. Quer dar uma declaração?","Sem comentários",{p:-12,c:2},"Pedir desculpas e indenizar",{p:12,d:-10},"SLA é o acordo de nível de serviço. Descumprir exige transparência e gestão de crise."),
+C("SafeCargo","Sr. Bento","🛡️","Seguro de carga: caro, mas e se roubarem tudo?","Dispensar",{d:8,c:-8},"Contratar",{d:-10,c:8},"O seguro de carga cobre roubo e avarias, protegendo a empresa e a confiança dos clientes."),
+C("HubCity","Sra. Lopes","🏭","Que tal um centro de distribuição no meio da cidade?","Não",{v:-6,d:6},"Construir hub",{d:-14,v:12,c:6},"No modelo hub-and-spoke, as cargas passam por um centro e saem em rotas menores, ganhando eficiência."),
+C("CrossDock","Bruno","📦","Podemos descarregar e já carregar em outro caminhão, sem estocar.","Armazenar antes",{d:-8,c:4},"Cross-docking",{d:8,v:-6,c:-4},"Cross-docking reduz armazenagem e acelera o fluxo, mas exige sincronização perfeita."),
+C("Cliente Fábio","Fábio","😡","Meu pedido chegou amassado!","Ignorar",{p:-12,d:4},"Trocar o produto",{p:10,d:-8,c:3},"Embalagem adequada e manuseio cuidadoso reduzem avarias e devoluções."),
+C("Vex Corp","Agente Vex","🕶️","Oferecemos uma fortuna pela sua rota premium.","Vender",{d:18,c:-12},"Recusar",{c:8,d:-6,p:4},"Ativos logísticos como rotas e contratos têm valor estratégico. Vender rápido pode custar caro depois."),
+C("SkyDrop","Dr. Quark","🚁","Teste de entregas com drones! O futuro é agora!","Arriscado demais",{c:-6,p:-3},"Testar",{d:-12,p:12,v:-4},"Drones prometem agilidade na última milha, mas enfrentam regras, clima e custo."),
+C("Sindicato","Líder Rosa","✊","Os motoristas ameaçam greve por causa da jornada.","Recusar",{p:-8,v:-10,d:8},"Negociar",{d:-10,v:8,p:6},"Equipes descansadas dirigem melhor. Jornada e segurança afetam toda a operação."),
+C("Análise","Analista Lia","📈","A previsão de demanda indica um grande aumento no mês que vem.","Ignorar",{d:6,v:-8,c:-6},"Contratar temporários",{d:-8,v:8,c:6},"Previsão de demanda ajuda a dimensionar frota, estoque e equipe antes do pico."),
+C("ArmazéMax","Dona Neide","🗃️","Que tal organizar o armazém pela curva ABC?","Não mexer",{d:5,c:-6},"Reorganizar",{d:-6,c:10},"Na curva ABC, os itens de maior giro (A) ficam mais perto da saída, reduzindo o tempo de separação."),
+C("BigRetail","Diretor Oto","📊","Nosso cliente exige OTIF de 98%.","Negociar meta menor",{c:-8,d:6},"Aceitar",{c:12,v:-10,p:4},"OTIF significa 'On Time, In Full': entregue no prazo e completo. É um dos principais indicadores de logística."),
+C("EcoPack","Bia Verde","♻️","Trocar o plástico por papelão reciclado?","Manter plástico",{d:6,p:-10},"Trocar",{d:-8,p:12},"Embalagens sustentáveis melhoram a imagem da empresa e reduzem o impacto ambiental."),
+C("TrackIt","Dev Bia","📱","O cliente quer ver o caminhão no mapa, em tempo real.","Adiar",{c:-6,d:4,p:-6},"Desenvolver app",{d:-10,p:12,c:4},"Visibilidade em tempo real reduz ligações e aumenta a confiança do cliente."),
+C("Posto Rex","Gerente Rex","⛽","O diesel subiu 15%!","Repassar ao cliente",{d:12,c:-10,p:-4},"Absorver o custo",{d:-14,c:8,p:4},"O frete compõe combustível, pedágio, mão de obra e manutenção. Repasses precisam de bom diálogo."),
+C("Laticínios Vale","Sr. Tadeu","🥛","Sugiro uma rota circular coletando em vários fornecedores (milk run).","Coletas separadas",{v:-8,d:-6},"Milk run",{v:8,d:6,p:-6},"Milk run é uma rota que coleta cargas de vários fornecedores em sequência, reduzindo viagens vazias."),
+C("Defesa Civil","Cap. Dias","🌧️","Chuva forte bloqueou várias vias!","Esperar",{p:-8,d:4,v:6},"Rota alternativa",{v:-10,d:-4,p:8},"Plano de contingência define rotas e ações alternativas para imprevistos."),
+C("BigCorp","Sra. Prado","💼","Queremos prioridade absoluta nas entregas!","Atender todos igualmente",{c:-10,p:6},"Prioridade VIP",{c:12,d:8,p:-12},"Priorizar clientes estratégicos gera receita, mas dependência excessiva é arriscada."),
+C("TI Interna","Nando","💻","Vamos integrar os sistemas (ERP e WMS)?","Seguir com planilhas",{d:6,c:-8,v:-4},"Integrar",{d:-12,c:8,v:8},"ERP gerencia a empresa; WMS gerencia o armazém. Integrados, reduzem erros e retrabalho."),
+C("Rodovias S.A.","Cabo Neves","🚓","Cargas estão sendo roubadas na rodovia principal.","Escolta armada",{d:-12,c:6,v:6},"Mudar de rota",{v:-6,d:-2,p:4},"Gerenciamento de risco inclui rotas seguras, horários e tecnologia de monitoramento.")
+];
+
+const PERKS=[
+{n:"🔮 Manutenção Preditiva",t:"Veículos +10. Eles desgastam menos a cada turno.",e:{v:10},dr:{v:.5}},
+{n:"🧠 Software de Rotas",t:"Dinheiro +10. A empresa gasta menos por turno.",e:{d:10},dr:{d:.5}},
+{n:"📢 Assessoria de Imprensa",t:"Público +10. A opinião pública cai mais devagar.",e:{p:10},dr:{p:.4}},
+{n:"🤝 Parceria Corporativa",t:"Empresas +10. As relações esfriam mais devagar.",e:{c:10},dr:{c:.5}},
+{n:"🏗️ Hub Automatizado",t:"Dinheiro +5, Veículos +5 e menos desgaste geral.",e:{d:5,v:5},dr:{d:.3,v:.3}},
+{n:"🎁 Programa de Fidelidade",t:"Público +10, Empresas +5, Dinheiro -10.",e:{p:10,c:5,d:-10},dr:{}}
+];
+
+const ENDS={
+d:{low:["💸","Falência!","Sem dinheiro, a UrbanLink não consegue pagar combustível nem salários.","Fluxo de caixa saudável é a base de qualquer operação logística."],
+   high:["🏦","Caixa parado demais!","Os acionistas cobram: tanto dinheiro parado sem investir na operação. Você foi demitido.","Capital parado é custo de oportunidade: dinheiro precisa ser reinvestido em frota, tecnologia e pessoas."]},
+c:{low:["📉","Clientes foram embora!","As empresas romperam seus contratos e a UrbanLink ficou sem clientes.","Relacionamento com o cliente (e cumprir SLAs) é o que mantém contratos."],
+   high:["🕴️","Dependência total!","As empresas passaram a mandar em tudo na UrbanLink. Você virou refém dos clientes.","Dependência excessiva de poucos clientes é um risco: diversifique a carteira."]},
+v:{low:["🔧","Frota sucateada!","Sem veículos funcionando, nada é entregue.","Frota precisa de manutenção e renovação contínuas."],
+   high:["🅿️","Frota ociosa!","Veículos demais parados estão custando uma fortuna em manutenção e seguros.","Ociosidade de frota gera custo sem receita. Dimensionar a frota é essencial."]},
+p:{low:["🔥","Boicote!","A opinião pública se virou contra a UrbanLink. Ninguém mais confia na empresa.","Reputação é um ativo: falhas de entrega se espalham rápido."],
+   high:["📸","Holofotes demais!","Com tanta fama, a imprensa expôs cada falha e os reguladores passaram a fiscalizar tudo.","Crescer rápido demais sem estrutura gera exposição e pressão regulatória."]}
+};
+
+/* ---------- Estado ---------- */
+let S;
+const $=s=>document.querySelector(s);
+const card=$("#card");
+let best=0;
+try{best=parseInt(localStorage.getItem("urbanlink_best")||"0")||0}catch(e){}
+
+function newGame(){
+  S={d:50,c:50,v:50,p:50,turn:0,drift:{...BASE_DRIFT},owned:[],deck:[],cur:null,busy:true,over:false};
+  $("#learn").textContent="💡 Arraste a carta para os lados (ou use ← →) e mantenha as quatro barras longe de 0 e de 100.";
+  buildBars();hud();
+  nextCard();
+}
+
+/* ---------- UI ---------- */
+function buildBars(){
+  $("#bars").innerHTML=KEYS.map(k=>`<div class="bar" id="b_${k}"><div class="dot" id="dot_${k}"></div><div class="ring"><div class="fill"></div><span>${RES[k].i}</span></div><div class="nm">${RES[k].n}</div></div>`).join("");
+  updateBars();
+}
+function updateBars(){
+  KEYS.forEach(k=>{
+    const el=$("#b_"+k);
+    const v=Math.max(0,Math.min(100,S[k]));
+    el.querySelector(".fill").style.height=v+"%";
+    el.classList.toggle("danger",v<20||v>80);
+  });
+}
+function hud(){
+  $("#wk").textContent=Math.floor(S.turn/5)+1;
+  $("#ct").textContent=S.turn;
+  $("#bs").textContent=best;
+}
+function clearPreview(){KEYS.forEach(k=>$("#dot_"+k).innerHTML="")}
+function preview(opt){
+  KEYS.forEach(k=>{
+    const a=Math.abs(opt.e[k]||0);
+    const s=a===0?0:a<=6?6:a<=12?9:13;
+    $("#dot_"+k).innerHTML=s?`<i style="width:${s}px;height:${s}px"></i>`:"";
+  });
+}
+function pick(){
+  if(!S.deck.length){S.deck=CARDS.map((_,i)=>i).sort(()=>Math.random()-.5);}
+  return CARDS[S.deck.pop()];
+}
+function nextCard(){
+  const c=pick();S.cur=c;
+  $("#co").textContent=c.co;$("#av").textContent=c.av;$("#who").textContent=c.who;$("#txt").textContent=c.txt;
+  $("#bL").textContent="◀ "+c.L.t;$("#bR").textContent=c.R.t+" ▶";
+  card.style.transition="none";
+  card.style.transform="translateY(40px) scale(.9)";card.style.opacity="0";
+  $("#choice").style.opacity=0;clearPreview();
+  void card.offsetWidth;
+  card.style.transition="transform .3s, opacity .3s";
+  card.style.transform="none";card.style.opacity="1";
+  setTimeout(()=>{S.busy=false},250);
+}
+
+/* ---------- Jogo ---------- */
+function choose(dir){
+  if(S.busy||S.over)return;
+  S.busy=true;
+  const opt=dir<0?S.cur.L:S.cur.R;
+  sfxSwish();
+  card.style.transition="transform .3s, opacity .3s";
+  card.style.transform=`translateX(${dir*700}px) rotate(${dir*30}deg)`;card.style.opacity="0";
+  clearPreview();
+  // efeitos
+  KEYS.forEach(k=>{
+    const e=opt.e[k]||0;
+    if(e){S[k]+=e;const el=$("#b_"+k);el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),300);}
+  });
+  $("#learn").textContent="💡 "+S.cur.learn;
+  S.turn++;
+  // recursos em constante mudança
+  const wk=Math.floor(S.turn/5)+1;
+  const extra=Math.min(1.2,Math.max(0,wk-3)*.1);
+  KEYS.forEach(k=>{S[k]+=S.drift[k]-extra*(k==="p"?.5:1)});
+  updateBars();hud();
+  setTimeout(()=>{
+    if(checkLose())return;
+    if(S.turn%15===0)showBonus();else nextCard();
+  },330);
+}
+function checkLose(){
+  for(const k of KEYS){
+    if(S[k]<=0){endGame(k,"low");return true}
+    if(S[k]>=100){endGame(k,"high");return true}
+  }
+  return false;
+}
+function showBonus(){
+  const avail=PERKS.filter(p=>!S.owned.includes(p.n)).sort(()=>Math.random()-.5).slice(0,3);
+  if(!avail.length){nextCard();return}
+  sfxBeep(880,.1);setTimeout(()=>sfxBeep(1320,.15),110);
+  $("#perks").innerHTML="";
+  avail.forEach(p=>{
+    const b=document.createElement("button");b.className="perk";
+    b.innerHTML=`<b>${p.n}</b><small>${p.t}</small>`;
+    b.onclick=()=>{
+      S.owned.push(p.n);
+      KEYS.forEach(k=>{S[k]+=(p.e[k]||0);S.drift[k]+=(p.dr[k]||0)});
+      updateBars();$("#bonus").classList.add("hide");sfxBeep(660,.1);
+      if(!checkLose())nextCard();
+    };
+    $("#perks").appendChild(b);
+  });
+  $("#bonus").classList.remove("hide");
+}
+function endGame(k,side){
+  S.over=true;
+  const e=ENDS[k][side];
+  const weeks=Math.floor(S.turn/5);
+  if(weeks>best){best=weeks;try{localStorage.setItem("urbanlink_best",best)}catch(x){}}
+  sfxLose();hud();
+  $("#eIco").textContent=e[0];$("#eTit").textContent=e[1];$("#eTxt").textContent=e[2];
+  $("#eLearn").textContent="💡 "+e[3];
+  $("#eWk").textContent=weeks;$("#eCt").textContent=S.turn;$("#eBs").textContent=best;
+  $("#end").classList.remove("hide");
+}
+
+/* ---------- Arrastar ---------- */
+let dragging=false,sx=0,dx=0;
+card.addEventListener("pointerdown",e=>{
+  if(S.busy||S.over)return;
+  dragging=true;sx=e.clientX;dx=0;card.setPointerCapture(e.pointerId);card.style.transition="none";
+});
+card.addEventListener("pointermove",e=>{
+  if(!dragging)return;
+  dx=e.clientX-sx;
+  card.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`;
+  const ch=$("#choice");
+  if(Math.abs(dx)>20){
+    const dir=dx<0?"L":"R";const opt=S.cur[dir];
+    ch.textContent=opt.t;ch.className=dir;ch.style.opacity=Math.min(1,Math.abs(dx)/110);
+    preview(opt);
+  }else{ch.style.opacity=0;clearPreview();}
+});
+function endDrag(){
+  if(!dragging)return;dragging=false;
+  if(Math.abs(dx)>110){choose(dx<0?-1:1)}
+  else{card.style.transition="transform .25s";card.style.transform="none";$("#choice").style.opacity=0;clearPreview();}
+}
+card.addEventListener("pointerup",endDrag);
+card.addEventListener("pointercancel",endDrag);
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft"||e.key==="a"||e.key==="A")choose(-1);
+  if(e.key==="ArrowRight"||e.key==="d"||e.key==="D")choose(1);
+});
+$("#bL").onclick=()=>choose(-1);
+$("#bR").onclick=()=>choose(1);
+
+/* ---------- Áudio (sintetizado) ---------- */
+let AC=null,master=null,musicGain=null,soundOn=true,musicTimer=null,step=0;
+const CHORDS=[[220,261.6,329.6],[174.6,220,261.6],[261.6,329.6,392],[196,246.9,293.7]];
+const BASS=[55,43.65,65.4,49];
+function initAudio(){
+  if(!AC){
+    const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+    AC=new Ctx();master=AC.createGain();master.gain.value=soundOn?.6:0;master.connect(AC.destination);
+    musicGain=AC.createGain();musicGain.gain.value=.55;musicGain.connect(master);
+    startMusic();
+  }
+  if(AC.state==="suspended")AC.resume();
+}
+function pad(freqs,t,dur){
+  freqs.forEach(f=>{
+    const o=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();
+    o.type="sawtooth";o.frequency.value=f;o.detune.value=(Math.random()-.5)*14;
+    fl.type="lowpass";fl.frequency.value=650;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+dur*.4);g.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(fl);fl.connect(g);g.connect(musicGain);o.start(t);o.stop(t+dur+.1);
+  });
+}
+function pluck(f,t){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.type="triangle";o.frequency.value=f;
+  g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+.45);
+  o.connect(g);g.connect(musicGain);o.start(t);o.stop(t+.5);
+}
+function bar(){
+  if(!AC||AC.state!=="running")return;
+  const t=AC.currentTime+.05,i=step%4,ch=CHORDS[i];
+  pad(ch,t,4.2);
+  const b=AC.createOscillator(),bg=AC.createGain();
+  b.type="sine";b.frequency.value=BASS[i];
+  bg.gain.setValueAtTime(0,t);bg.gain.linearRampToValueAtTime(.18,t+.3);bg.gain.linearRampToValueAtTime(0,t+4);
+  b.connect(bg);bg.connect(musicGain);b.start(t);b.stop(t+4.1);
+  for(let n=0;n<8;n++){if(Math.random()<.7)pluck(ch[n%3]*2,t+n*.5)}
+  step++;
+}
+function startMusic(){bar();musicTimer=setInterval(bar,4000)}
+function sfxSwish(){
+  if(!AC)return;
+  const len=AC.sampleRate*.16,buf=AC.createBuffer(1,len,AC.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
+  const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
+  s.buffer=buf;f.type="bandpass";f.frequency.setValueAtTime(1500,AC.currentTime);f.frequency.exponentialRampToValueAtTime(5000,AC.currentTime+.15);
+  g.gain.value=.5;s.connect(f);f.connect(g);g.connect(master);s.start();
+  sfxBeep(520,.05);
+}
+function sfxBeep(freq,dur){
+  if(!AC)return;
+  const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;
+  o.type="square";o.frequency.value=freq;
+  g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.02);
+}
+function sfxLose(){
+  if(!AC)return;
+  const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;
+  o.type="sawtooth";o.frequency.setValueAtTime(440,t);o.frequency.exponentialRampToValueAtTime(60,t+.9);
+  g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.9);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+1);
+}
+$("#mute").onclick=()=>{
+  initAudio();soundOn=!soundOn;
+  if(master)master.gain.value=soundOn?.6:0;
+  $("#mute").textContent=soundOn?"🔊":"🔇";
+};
+
+/* ---------- Início ---------- */
+$("#go").onclick=()=>{initAudio();$("#start").classList.add("hide");newGame();};
+$("#again").onclick=()=>{$("#end").classList.add("hide");initAudio();newGame();};
+$("#bs").textContent=best;
+</script>
+</body>
+</html>
